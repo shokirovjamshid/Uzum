@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv('.env')
@@ -14,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', False)
 
 ALLOWED_HOSTS = ['*']
 
@@ -34,6 +35,9 @@ INSTALLED_APPS = [
     # online apps
     'drf_spectacular',
     'rest_framework_simplejwt',
+    'rest_framework_swagger',
+    'django_celery_beat'
+
 ]
 
 MIDDLEWARE = [
@@ -51,7 +55,7 @@ ROOT_URLCONF = 'root.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': []
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -114,8 +118,21 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+REDIS_PORT = os.getenv('REDIS_PORT')
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+CELERY_BROKER_URL = REDIS_URL
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
+}
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'UZUM MARKET API',
@@ -132,13 +149,6 @@ REST_FRAMEWORK = {
     )
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://localhost:6379",
-    }
-}
-
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
     "site_title": "UZUM MARKET ADMIN",
@@ -150,10 +160,10 @@ JAZZMIN_SETTINGS = {
     "site_brand": "UZUM MARKET",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "4cd4a93ee7d9f6e529f343d59cd78da4.jpg",
+    "site_logo": "apps/4cd4a93ee7d9f6e529f343d59cd78da4.jpg",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": '4cd4a93ee7d9f6e529f343d59cd78da4.jpg',
+    "login_logo": 'apps/4cd4a93ee7d9f6e529f343d59cd78da4.jpg',
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
