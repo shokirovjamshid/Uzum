@@ -15,7 +15,6 @@ class User(AbstractUser):
         SELLER = 'seller', 'Seller'
         MANAGER = 'manager', 'Manager'
     phone = CharField(max_length=12,validators=[uz_phone_validator],unique=True)
-    father_name = CharField(max_length=255,null=True)
     type = CharField(max_length=12,choices=TypeChoice.choices,default=TypeChoice.USER)
     gander = CharField(max_length=6,choices=GanderChoice.choices,default=GanderChoice.FEMALE)
     birth_date = DateField(null=True,blank=True)
