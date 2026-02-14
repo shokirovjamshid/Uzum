@@ -37,6 +37,9 @@ fabric.properties
 [Ss]cripts
 pyvenv.cfg
 .venv
+.idea
+media
+
 pip-selfcheck.json
 __pycache__/
 *.py[cod]
