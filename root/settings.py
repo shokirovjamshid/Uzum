@@ -150,10 +150,10 @@ JAZZMIN_SETTINGS = {
     "site_brand": "UZUM MARKET",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "4cd4a93ee7d9f6e529f343d59cd78da4.jpg",
+    "site_logo": "apps/4cd4a93ee7d9f6e529f343d59cd78da4.jpg",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": '4cd4a93ee7d9f6e529f343d59cd78da4.jpg',
+    "login_logo": 'apps/4cd4a93ee7d9f6e529f343d59cd78da4.jpg',
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
