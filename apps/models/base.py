@@ -1,6 +1,6 @@
 from io import BytesIO
 
-import Image
+from PIL import Image
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from django.core.validators import FileExtensionValidator

@@ -18,6 +18,8 @@ cmake-build-*/
 .idea/**/mongoSettings.xml
 *.iws
 out/
+!**migrations/__init__.py
+**migrations**
 .idea_modules/
 atlassian-ide-plugin.xml
 .idea/replstate.xml
@@ -39,7 +41,7 @@ pyvenv.cfg
 .venv
 .idea
 media
-
+.env
 pip-selfcheck.json
 __pycache__/
 *.py[cod]
