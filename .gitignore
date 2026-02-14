@@ -103,6 +103,7 @@ celerybeat.pid
 *.sage.py
 .env
 env/
+**migrations**
 venv/
 ENV/
 env.bak/
@@ -118,3 +119,4 @@ dmypy.json
 .pytype/
 cython_debug/
 .idea
+sqlite3*
