@@ -1,7 +1,10 @@
-from django.db.models import Model, ForeignKey, CASCADE
+from django.db.models import CASCADE
 from django.db.models.fields import CharField
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 
-class Category(Model):
-    name = CharField(max_length=255, unique=True)
-    parent = ForeignKey('self', CASCADE, null=True, blank=True, related_name='topics')
+class Category(MPTTModel):
+    name = CharField(max_length=255)
+    parent = TreeForeignKey('self', on_delete=CASCADE, null=True, blank=True, related_name='subcategory')
+

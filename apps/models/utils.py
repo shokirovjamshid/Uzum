@@ -21,3 +21,9 @@ def upload_to_image(obj, filename: str):
     date_path = datetime.now().strftime("%Y/%m/%d")
 
     return f"{_name}/{date_path}/{filename}"
+
+
+def validate_video(value):
+    valid_extensions = ['mp4', 'avi', 'mov', 'mkv']
+    if not value.name.split('.')[-1].lower() in valid_extensions:
+        raise ValidationError('Faqat video fayl (.mp4, .avi, .mov, .mkv) ruxsat etiladi.')
