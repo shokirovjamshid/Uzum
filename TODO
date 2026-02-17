@@ -1,0 +1,61 @@
+uzum:
+ordering
+filter (mahsulot qayga qarab filter) qayerdan olayapti ??
+Order(ya'ni zakaz qilish dagi hususiyati orqali qilish)
+
+recommendation(tavsiya genderga qarab yoki shunchaki) qanday qilinadi
+ko'rishlar soni
+
+Ordering ya'ni zakaz
+register yoki login qiligandan keyin qayerga otib yuborishi
+
+chat qo'shish kerak user bilan seller o'rtasida
+Higt load(ddos attack,balance)
+
+smartfon-wo-x-16-8128-gb
+Smartfon W&O X 16 8/128 GB
+
+smartfon-infinix-hot
+Smartfon Infinix HOT
+
+smartfon-xiaomi-redmi
+Smartfon Xiaomi Redmi
+
+Smartfon Xiaomi Redmi Note 15 Pro 5G, 12+512 GB, 200 MP, 6.83″ 1.5K AMOLED, 6580 mAh.
+
+Smartfon HTC E5 4+4/64 GB, 6.745
+smartfon-htc-e5-4464-gb-6745
+
+Seller model:
+Register:
+Ism
+phone_number
+Email
+Status Yatt,yoki Yuridik
+parol
+
+Login:
+phone_nuber yoki email
+parol
+
+
+Product Modeli:
+1. 4ta category majburiy
+2.Nomi rus/uzbek tilida majburiy (max_len = 92) CharField()
+3.Toval belgisi null = True,Blank=True
+4.Modeli ( uchun model) null = True,Blank=True
+   brend uchun alohida model
+5.Ishlab chiqarilgan mamlakati null = True,Blank=True (Model yozmiza)
+6.Description uz/ru tilida majburiy text(ckeditor)
+7.Tovar rasmi valid[pnf,jpeg,jpg] hajmi = 5mb  3x4 bo'lishi kerak oq fon majburiy
+Tovar orqafoni:#efefef
+360 rasm model valid[p.B3d,zip] majburiy emas hajmi 10mb gacha
+8.Video valid[1080x1440 format,hajmi = 10 mb] majburiy emas
+9.Short description uz/ru tilida majburiy charfield(max_len390)
+10.Tovar xususiyatlari uz/ru tilida list(CharField(max_len = 255)) majburiy emas
+11.Xususiyatlarni tanlash (xusiyatlar degan model bo'ladi) maximum 5 ta qo'shish mumkin rang ucun moel
+12.Xususiyati uchun rasm,video,360lik rasm alohida-alohida
+13.O'lchamlari turi text(ckeditor) majburiy emas uz/ru tilida
+14.Tarkibi text(ckeditor) null = True,Blank=True
+15.Foydalanish bo'yicha yo'riqnamalar text(ckeditor) null = True,Blank=True
+16.Sertifikat text(ckeditor) null = True,Blank=True
