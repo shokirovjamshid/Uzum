@@ -1,5 +1,5 @@
 from django.db.models import Model, CharField, ForeignKey, SET_NULL, BooleanField, IntegerField, \
-    IntegerChoices, TimeField
+    IntegerChoices, TimeField, DecimalField
 
 
 class City(Model):
@@ -15,6 +15,8 @@ class Address(Model):
     is_wearing_room = BooleanField(default=False)
     # working_hours = JSONField(default=dict, blank=True)
     deadline_time = IntegerField(default=0)
+    longitude = DecimalField(max_digits=9, decimal_places=6)
+    latitude = DecimalField(max_digits=9, decimal_places=6)
 
     def __str__(self):
         return f"{self.city},{self.street}"
