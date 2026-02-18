@@ -59,3 +59,11 @@ Tovar orqafoni:#efefef
 14.Tarkibi text(ckeditor) null = True,Blank=True
 15.Foydalanish bo'yicha yo'riqnamalar text(ckeditor) null = True,Blank=True
 16.Sertifikat text(ckeditor) null = True,Blank=True
+
+foreign keylar slug + id bilan
+
+Task:
+1.Topshirish punktini belgilash(ishlash vaqtlari bilan)
+2.Savol va javoblar
+3.Ko'ptillik
+4.Hamma tovarlarni ko'rish ko'rish

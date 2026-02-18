@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField, TextChoices, DateField, BooleanField, IntegerChoices
+from django.db.models import CharField, TextChoices, DateField, BooleanField, IntegerChoices, Model, ForeignKey
+from django_ckeditor_5.fields import CKEditor5Field
 
 from apps.managers import CustomUserManager
 from apps.models.utils import uz_phone_validator
@@ -23,3 +24,18 @@ class User(AbstractUser):
     username = None
     USERNAME_FIELD = "phone"
     objects = CustomUserManager()
+
+class QuestionCategory(Model):
+    question = CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.question}"
+
+
+class Answer(Model):
+    question_category = ForeignKey('apps.QuestionCategory', related_name='answers')
+    question = CharField(max_length=255)
+    answer = CKEditor5Field()
+
+    def __str__(self):
+        return f"{self.question}"
