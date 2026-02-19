@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField, TextChoices, DateField, BooleanField, IntegerChoices, Model, ForeignKey
+from django.db.models import CharField, TextChoices, DateField, BooleanField, IntegerChoices, Model, ForeignKey, CASCADE
 from django_ckeditor_5.fields import CKEditor5Field
 
 from apps.managers import CustomUserManager
@@ -34,7 +34,7 @@ class QuestionCategory(Model):
 
 
 class Answer(Model):
-    question_category = ForeignKey('apps.QuestionCategory', related_name='answers')
+    question_category = ForeignKey('apps.QuestionCategory', CASCADE ,related_name='answers')
     question = CKEditor5Field(max_length=255)
     answer = CKEditor5Field()
 
