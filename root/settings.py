@@ -30,6 +30,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_ckeditor_5',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'location_field.apps.DefaultConfig',
     # my apps
     'apps',
 

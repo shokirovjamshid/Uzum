@@ -380,6 +380,14 @@ wheels = [
 ]
 
 [[package]]
+name = "django-location-field"
+version = "2.7.3"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cd/c3/37c545104c47d97331392a81f3765a2820cf69a0e3b362b2f4fdf250adc1/django_location_field-2.7.3-py2.py3-none-any.whl", hash = "sha256:b0660d3fd024541fbe53ef723e3b02ec4014fbc886ee3d8342e031f1ab28d11d", size = 920952, upload-time = "2023-11-21T14:20:59.132Z" },
+]
+
+[[package]]
 name = "django-minio-storage"
 version = "0.5.9"
 source = { registry = "https://pypi.org/simple" }
@@ -1102,6 +1110,7 @@ dependencies = [
     { name = "django-celery-beat" },
     { name = "django-ckeditor-5" },
     { name = "django-jazzmin" },
+    { name = "django-location-field" },
     { name = "django-minio-storage" },
     { name = "django-mptt" },
     { name = "django-rest-swagger" },
@@ -1121,6 +1130,7 @@ requires-dist = [
     { name = "django-celery-beat", specifier = ">=2.1.0" },
     { name = "django-ckeditor-5", specifier = ">=0.2.19" },
     { name = "django-jazzmin", specifier = ">=3.0.2" },
+    { name = "django-location-field", specifier = ">=2.7.3" },
     { name = "django-minio-storage", specifier = ">=0.5.9" },
     { name = "django-mptt", specifier = ">=0.18.0" },
     { name = "django-rest-swagger", specifier = ">=2.2.0" },
