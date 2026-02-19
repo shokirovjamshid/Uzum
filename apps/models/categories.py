@@ -7,4 +7,3 @@ from mptt.models import MPTTModel
 class Category(MPTTModel):
     name = CharField(max_length=255)
     parent = TreeForeignKey('self', on_delete=CASCADE, null=True, blank=True, related_name='subcategory')
-

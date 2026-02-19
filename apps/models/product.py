@@ -1,8 +1,8 @@
-from django.db.models import ForeignKey, CASCADE, SET_NULL
+from django.db.models import ForeignKey, SET_NULL
 from django_ckeditor_5.fields import CKEditor5Field
 from rest_framework.fields import CharField
 
-from apps.models.base import CreatedBaseModel, SlugBaseModel
+from apps.models.base import CreatedBaseModel
 
 
 class Product(CreatedBaseModel):
@@ -14,4 +14,4 @@ class Product(CreatedBaseModel):
     description = CKEditor5Field()
     # 360 gradusli rasm
     short_description = CharField(max_length=390)
-    feature = CharField(max_length=255,null=True,blank=True)
+    feature = CharField(max_length=255, null=True, blank=True)

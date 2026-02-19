@@ -25,6 +25,7 @@ class User(AbstractUser):
     USERNAME_FIELD = "phone"
     objects = CustomUserManager()
 
+
 class QuestionCategory(Model):
     question = CharField(max_length=255)
 
@@ -34,7 +35,7 @@ class QuestionCategory(Model):
 
 class Answer(Model):
     question_category = ForeignKey('apps.QuestionCategory', related_name='answers')
-    question = CharField(max_length=255)
+    question = CKEditor5Field(max_length=255)
     answer = CKEditor5Field()
 
     def __str__(self):
