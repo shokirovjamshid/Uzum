@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField, TextChoices, DateField, BooleanField, IntegerChoices, Model, ForeignKey, CASCADE
-from django_ckeditor_5.fields import CKEditor5Field
 from django.db.models import CharField, TextChoices, DateField, BooleanField, IntegerChoices, EmailField
+from django.db.models import Model, ForeignKey, CASCADE
+from django_ckeditor_5.fields import CKEditor5Field
 
 from apps.managers import CustomUserManager
 from apps.models.utils import uz_phone_validator
@@ -22,7 +22,7 @@ class User(AbstractUser):
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
     patronymic = CharField(max_length=30, null=True, blank=True)
     type = CharField(max_length=12, choices=TypeChoice.choices, default=TypeChoice.USER)
-    gander = BooleanField(null=True, blank=True, help_text=('True Male False Female'))
+    gender = BooleanField(null=True, blank=True, choices=Gender.MALE, help_text=('True Male False Female'))
     birth_date = DateField(null=True, blank=True)
     username = None
     USERNAME_FIELD = "phone"
@@ -37,7 +37,7 @@ class QuestionCategory(Model):
 
 
 class Answer(Model):
-    question_category = ForeignKey('apps.QuestionCategory', CASCADE ,related_name='answers')
+    question_category = ForeignKey('apps.QuestionCategory', CASCADE, related_name='answers')
     question = CKEditor5Field(max_length=255)
     answer = CKEditor5Field()
 

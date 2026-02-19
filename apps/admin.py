@@ -1,10 +1,9 @@
 from django.contrib import admin
-from apps.models.addresses import City,WorkingHours,Address
-from apps.models.users import Answer, QuestionCategory
-
 from django.contrib.auth.admin import UserAdmin
 
 from apps.models import City, DaysWeek, User
+from apps.models.addresses import WorkingHours, Address
+from apps.models.users import Answer, QuestionCategory
 
 
 # Register your models here.
@@ -40,15 +39,17 @@ class QuestionCategoryAdmin(admin.ModelAdmin):
     inlines = [AnswerInline]
     fields = 'id', 'question'
 
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     ordering = ['phone']
+
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(DaysWeek)
 class DaysWeekAdmin(admin.ModelAdmin):
     pass
-
