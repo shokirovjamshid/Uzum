@@ -355,6 +355,26 @@ wheels = [
 ]
 
 [[package]]
+name = "django-js-asset"
+version = "3.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e6/91/c63f136f553ec24fc46ccf20ac7292a8df04815b383975b6f3f7f0060217/django_js_asset-3.1.2.tar.gz", hash = "sha256:1fc7584199ed1941ed7c8e7b87ca5524bb0f2ba941561d2a104e88ee9f07bedd", size = 9471, upload-time = "2025-03-04T15:22:49.789Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/cf/b208767db5e56b5189829f753eec6a14ee75d074922dc2bd19220b22a34d/django_js_asset-3.1.2-py3-none-any.whl", hash = "sha256:b5ffe376aebbd73b7af886d675ac9f43ca63b39540190fa8409c9f8e79145f68", size = 5905, upload-time = "2025-03-04T15:22:51.152Z" },
+]
+
+[[package]]
+name = "django-location-field"
+version = "2.7.3"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cd/c3/37c545104c47d97331392a81f3765a2820cf69a0e3b362b2f4fdf250adc1/django_location_field-2.7.3-py2.py3-none-any.whl", hash = "sha256:b0660d3fd024541fbe53ef723e3b02ec4014fbc886ee3d8342e031f1ab28d11d", size = 920952, upload-time = "2023-11-21T14:20:59.132Z" },
+]
+
+[[package]]
 name = "django-minio-storage"
 version = "0.5.9"
 source = { registry = "https://pypi.org/simple" }
@@ -365,6 +385,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/21/c3/451548ed0bc26f3b50784c1b6696c14fc83cf12a94990c0b3f4c355c7716/django_minio_storage-0.5.9.tar.gz", hash = "sha256:86f823690ed18049b2dae6450498caf86215f3d44f85e0264094968ee1ad7af4", size = 118486, upload-time = "2025-11-24T18:33:57.702Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/a4/3d4c7c54fdcd718554dd3f19e95db362f02c332f51dd8facdf6ca1a96154/django_minio_storage-0.5.9-py3-none-any.whl", hash = "sha256:c6045fb598f6f924aaecbe02de423c584b23912725ab4d03115bc37214bd93ef", size = 17970, upload-time = "2025-11-24T18:33:56.679Z" },
+]
+
+[[package]]
+name = "django-mptt"
+version = "0.18.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django-js-asset" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/25/04bb8e4384f3484dabbd0e2a84946f1c972b95b07512509a17aaa361be0f/django_mptt-0.18.0.tar.gz", hash = "sha256:cf5661357ff22bc64e20d3341c26e538aa54583aea0763cfe6aaec0ab8e3a8ee", size = 71407, upload-time = "2025-08-26T09:27:01.05Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/51/9e/78aad58a90f2e4d0c898eeadd2f2b720bcae29b43676dd37c2b627c4c6c6/django_mptt-0.18.0-py3-none-any.whl", hash = "sha256:bfa3f01627e3966a1df901aeca74570a3e933e66809ebf58d9df673e63627afb", size = 120157, upload-time = "2025-08-26T09:27:02.168Z" },
 ]
 
 [[package]]
@@ -1064,7 +1096,9 @@ dependencies = [
     { name = "django" },
     { name = "django-celery-beat" },
     { name = "django-jazzmin" },
+    { name = "django-location-field" },
     { name = "django-minio-storage" },
+    { name = "django-mptt" },
     { name = "django-rest-swagger" },
     { name = "django-storages" },
     { name = "djangorestframework-simplejwt" },
@@ -1081,7 +1115,9 @@ requires-dist = [
     { name = "django", specifier = ">=6.0.2" },
     { name = "django-celery-beat", specifier = ">=2.1.0" },
     { name = "django-jazzmin", specifier = ">=3.0.2" },
+    { name = "django-location-field", specifier = ">=2.7.3" },
     { name = "django-minio-storage", specifier = ">=0.5.9" },
+    { name = "django-mptt", specifier = ">=0.18.0" },
     { name = "django-rest-swagger", specifier = ">=2.2.0" },
     { name = "django-storages", specifier = ">=1.14.6" },
     { name = "djangorestframework-simplejwt", specifier = ">=5.5.1" },

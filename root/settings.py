@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework_simplejwt',
     'rest_framework_swagger',
-    'django_celery_beat'
+    'django_celery_beat',
+    'location_field',
 
 ]
 
@@ -113,11 +114,10 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# settings.py
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -160,10 +160,10 @@ JAZZMIN_SETTINGS = {
     "site_brand": "UZUM MARKET",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "apps/4cd4a93ee7d9f6e529f343d59cd78da4.jpg",
+    "site_logo": "apps/uzum.jpeg",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": 'apps/4cd4a93ee7d9f6e529f343d59cd78da4.jpg',
+    "login_logo": 'apps/uzum.jpeg',
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
@@ -182,7 +182,7 @@ JAZZMIN_SETTINGS = {
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use a simple string
-    "search_model": ["auth.User", "auth.Group"],
+    "search_model": ["apps.User", "auth.Group"],
 
     # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
     "user_avatar": None,
@@ -214,7 +214,7 @@ JAZZMIN_SETTINGS = {
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
     "usermenu_links": [
         {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
-        {"model": "auth.user"}
+        {"model": "apps.User"}
     ],
 
     #############
@@ -234,7 +234,7 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["auth", "books", "books.author", "books.book"],
+    "order_with_respect_to": ["auth", "apps", "apps.User"],
 
     # Custom links to append to app groups, keyed on app name
     "custom_links": {
@@ -252,6 +252,7 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
+        "apps.User": "fas fa-user-shield",  # O'zingizning User modelingiz uchun ikonka
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
