@@ -4,12 +4,8 @@ from location_field.models.plain import PlainLocationField
 
 class City(Model):
     name = CharField(max_length=100)
-    is_default = BooleanField(default=False)
+    is_default = BooleanField(default=False,null=True,blank=True)
     location = PlainLocationField(based_fields=['city'], zoom=6)
-
-
-
-
 
 #   {
 #     "id": 1720,

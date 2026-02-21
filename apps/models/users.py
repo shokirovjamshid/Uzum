@@ -16,7 +16,7 @@ class User(AbstractUser):
         MALE = 1, 'Male'
         FEMALE = 0, 'Female'
 
-    email = EmailField(unique=True, null=True, blank=True, )
+    email = EmailField(unique=True, null=True, blank=True)
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
     patronymic = CharField(max_length=30, null=True, blank=True)
     type = CharField(max_length=12, choices=TypeChoice.choices, default=TypeChoice.USER)
