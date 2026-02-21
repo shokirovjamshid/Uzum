@@ -22,7 +22,7 @@ class User(AbstractUser):
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
     patronymic = CharField(max_length=30, null=True, blank=True)
     type = CharField(max_length=12, choices=TypeChoice.choices, default=TypeChoice.USER)
-    gender = BooleanField(null=True, blank=True, choices=Gender.MALE, help_text=('True Male False Female'))
+    gender = BooleanField(null=True, blank=True, choices=Gender.choices, help_text=('True Male False Female'))
     birth_date = DateField(null=True, blank=True)
     username = None
     USERNAME_FIELD = "phone"

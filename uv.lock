@@ -356,18 +356,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-jazzmin"
-version = "3.0.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/1b/1e/1ac1b4b916d86c3bbe950ddb8c952452f833c3b687e0d0cdbc824d3a9df6/django_jazzmin-3.0.2.tar.gz", hash = "sha256:cb247757b1e71f0c0f97d776856a32c3dd1377a7ffda6a731879cdc5e0e9ae89", size = 2361868, upload-time = "2026-02-08T17:37:10.435Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ff/21/38d96baf6733c77dc51aeda953aec0a401f11b1d373f00efd92c05b3c0f9/django_jazzmin-3.0.2-py3-none-any.whl", hash = "sha256:e847be81f9704ba70b740fa8378781bd1412e9d09772ba0e6a0c8b56fcdf84d4", size = 2441213, upload-time = "2026-02-08T17:37:08.146Z" },
-]
-
-[[package]]
 name = "django-js-asset"
 version = "3.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -426,6 +414,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/89/b3/56348f840201f3760
 wheels = [
     { url = "https://files.pythonhosted.org/packages/26/b0/1df8743c3150630c2ce1f98f9f0f451038e43fb58a68d5da7877754f37b7/django_rest_swagger-2.2.0-py2.py3-none-any.whl", hash = "sha256:b039b0288bab4665cd45dc5d16f94b13911bc4ad0ed55f74ad3b90aa31c87c17", size = 495298, upload-time = "2018-04-30T19:59:57.896Z" },
 ]
+
+[[package]]
+name = "django-simpleui"
+version = "2026.1.13"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f4/c2/b94aec95e96a74b9b075baa3d70a5600d2f56136b051999076136564677c/django_simpleui-2026.1.13.tar.gz", hash = "sha256:c417bc462020c5d05ddd518593b3d6fd1191d226c3b14a9593f3d654a12d2fbe", size = 6483742, upload-time = "2026-01-13T06:28:46.694Z" }
 
 [[package]]
 name = "django-storages"
@@ -1109,11 +1106,11 @@ dependencies = [
     { name = "django" },
     { name = "django-celery-beat" },
     { name = "django-ckeditor-5" },
-    { name = "django-jazzmin" },
     { name = "django-location-field" },
     { name = "django-minio-storage" },
     { name = "django-mptt" },
     { name = "django-rest-swagger" },
+    { name = "django-simpleui" },
     { name = "django-storages" },
     { name = "djangorestframework-simplejwt" },
     { name = "drf-spectacular" },
@@ -1129,11 +1126,11 @@ requires-dist = [
     { name = "django", specifier = ">=6.0.2" },
     { name = "django-celery-beat", specifier = ">=2.1.0" },
     { name = "django-ckeditor-5", specifier = ">=0.2.19" },
-    { name = "django-jazzmin", specifier = ">=3.0.2" },
     { name = "django-location-field", specifier = ">=2.7.3" },
     { name = "django-minio-storage", specifier = ">=0.5.9" },
     { name = "django-mptt", specifier = ">=0.18.0" },
     { name = "django-rest-swagger", specifier = ">=2.2.0" },
+    { name = "django-simpleui", specifier = ">=2026.1.13" },
     { name = "django-storages", specifier = ">=1.14.6" },
     { name = "djangorestframework-simplejwt", specifier = ">=5.5.1" },
     { name = "drf-spectacular", specifier = ">=0.29.0" },
