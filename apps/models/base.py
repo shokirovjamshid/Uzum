@@ -35,7 +35,9 @@ class CreatedBaseModel(Model):
 class ImageBaseModel(Model):
     image = ImageField(upload_to=upload_to_image, null=True, blank=True,
                        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-                                   upload_image_size_5mb_validator],help_text="Hajmi 5 mb dan oshmasin va 3x4 bo'lishi kerak.Orqa fon oq bo'lishi kerak")
+                                   upload_image_size_5mb_validator],
+                       help_text="Hajmi 5 mb dan oshmasin va 3x4 bo'lishi kerak.Orqa fon oq bo'lishi kerak")
+
     def convert_img_to_webp(self):
         is_new_upload = isinstance(self.image.file, (InMemoryUploadedFile, TemporaryUploadedFile))
 

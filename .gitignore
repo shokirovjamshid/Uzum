@@ -18,6 +18,7 @@ cmake-build-*/
 .idea/**/mongoSettings.xml
 *.iws
 out/
+apps/tests.py
 !**migrations/__init__.py
 **migrations**
 .idea_modules/

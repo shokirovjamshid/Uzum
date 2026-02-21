@@ -43,7 +43,6 @@ class CustomUserAdmin(ModelAdmin):
 class CityAdmin(ModelAdmin):
     pass
 
-
 @admin.register(DaysWeek)
 class DaysWeekAdmin(ModelAdmin):
     pass
