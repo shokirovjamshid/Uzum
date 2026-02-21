@@ -46,20 +46,3 @@ class CityAdmin(ModelAdmin):
 @admin.register(DaysWeek)
 class DaysWeekAdmin(ModelAdmin):
     pass
-
-
-class WeekdayStackedInline(StackedInline):
-    model = Weekday
-    extra = 0
-    min_num = 0
-
-
-class WeekdaysInfoStackedInline(StackedInline):
-    model = WeekdaysInfo
-    extra = 0
-    min_num = 0
-
-
-@admin.register(DeliveryPoint)
-class DeliveryPointAdmin(admin.ModelAdmin):
-    inlines = WeekdayStackedInline, WeekdaysInfoStackedInline
