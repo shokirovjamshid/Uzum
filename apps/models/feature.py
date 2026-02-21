@@ -16,6 +16,8 @@ class Brand(Model):
 
 class Country(Model):
     name = CharField(max_length=50)
+
+
 # from django.db.models import Model, CharField, ForeignKey, CASCADE, FileField, SET_NULL
 #
 # from apps.models.base import ImageBaseModel

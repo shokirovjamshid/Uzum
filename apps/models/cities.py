@@ -7,10 +7,6 @@ class City(Model):
     is_default = BooleanField(default=False)
     location = PlainLocationField(based_fields=['city'], zoom=6)
 
-
-
-
-
 #   {
 #     "id": 1720,
 #     "cityId": 1,
