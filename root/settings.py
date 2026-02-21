@@ -22,13 +22,13 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'simpleui',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',  # Faqat bitta qoldi
-    'django.contrib.staticfiles',  # Faqat bitta qoldi
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
 
     'django_ckeditor_5',
     'location_field.apps.DefaultConfig',
@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'root.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('POSTGRES_NAME'),
+        'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'PORT': os.getenv('POSTGRES_PORT'),

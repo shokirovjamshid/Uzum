@@ -13,7 +13,6 @@ dependencies = [
     "django-minio-storage>=0.5.9",
     "django-mptt>=0.18.0",
     "django-rest-swagger>=2.2.0",
-    "django-simpleui>=2026.1.13",
     "django-storages>=1.14.6",
     "djangorestframework-simplejwt>=5.5.1",
     "drf-spectacular>=0.29.0",

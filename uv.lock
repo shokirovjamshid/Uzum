@@ -416,15 +416,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-simpleui"
-version = "2026.1.13"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/f4/c2/b94aec95e96a74b9b075baa3d70a5600d2f56136b051999076136564677c/django_simpleui-2026.1.13.tar.gz", hash = "sha256:c417bc462020c5d05ddd518593b3d6fd1191d226c3b14a9593f3d654a12d2fbe", size = 6483742, upload-time = "2026-01-13T06:28:46.694Z" }
-
-[[package]]
 name = "django-storages"
 version = "1.14.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1110,7 +1101,6 @@ dependencies = [
     { name = "django-minio-storage" },
     { name = "django-mptt" },
     { name = "django-rest-swagger" },
-    { name = "django-simpleui" },
     { name = "django-storages" },
     { name = "djangorestframework-simplejwt" },
     { name = "drf-spectacular" },
@@ -1130,7 +1120,6 @@ requires-dist = [
     { name = "django-minio-storage", specifier = ">=0.5.9" },
     { name = "django-mptt", specifier = ">=0.18.0" },
     { name = "django-rest-swagger", specifier = ">=2.2.0" },
-    { name = "django-simpleui", specifier = ">=2026.1.13" },
     { name = "django-storages", specifier = ">=1.14.6" },
     { name = "djangorestframework-simplejwt", specifier = ">=5.5.1" },
     { name = "drf-spectacular", specifier = ">=0.29.0" },
