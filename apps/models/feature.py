@@ -17,15 +17,6 @@ class Country(Model):
     name_uz = CharField(max_length=100)
 
 
-class Attribute(Model):
-    name = CharField(max_length=100)
-
-
-class AttributeValue(Model):
-    attribute = ForeignKey("apps.Attribute", CASCADE, related_name='values')
-    value = CharField(max_length=100)
-
-
 class Color(Model):
     name = CharField(max_length=50)
     category = ManyToManyField('Category', related_name='colors')

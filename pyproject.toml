@@ -29,6 +29,8 @@ dependencies = [
     "ujson>=5.11.0",
     "django-elasticsearch-dsl>=9.0",
     "djangorestframework-stubs>=3.16.8",
+    "daphne>=4.2.1",
+    "utils",
 ]
 
 [dependency-groups]

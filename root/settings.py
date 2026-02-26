@@ -24,6 +24,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     # "unfold",
     # "unfold.contrib.filters",
     # "unfold.contrib.forms",  # optional, if special form elements are needed
@@ -33,6 +34,7 @@ INSTALLED_APPS = [
     # "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
     # "unfold.contrib.location_field",  # optional, if django-location-field package is used
     # "unfold.contrib.constance",  # optional, if django-constance package is used
+'django.contrib.postgres',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,8 +44,9 @@ INSTALLED_APPS = [
     # my apps
     'apps',
     # third-party apps
-    'rest_framework',
+
     'channels',
+    'rest_framework',
     # online apps
     'drf_spectacular',
     'rest_framework_simplejwt',

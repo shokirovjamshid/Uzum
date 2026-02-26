@@ -1,6 +1,6 @@
 from django_filters import FilterSet, NumberFilter, CharFilter
 
-from .models import Product
+from apps.models.categories import Product
 
 
 class ProductFilter(FilterSet):
@@ -11,7 +11,7 @@ class ProductFilter(FilterSet):
 
     class Meta:
         model = Product
-        fields = ['category', 'brand']
+        fields = []
 
     @property
     def qs(self):

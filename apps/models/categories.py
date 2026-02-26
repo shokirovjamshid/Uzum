@@ -43,7 +43,7 @@ class Product(CreatedBaseModel,SlugBaseModel):
 
     name_uz = CharField(max_length=92)
 
-    model = ForeignKey("apps.ProductModel", SET_NULL, null=True, blank=True)
+    model = ForeignKey("apps.ProductModel", SET_NULL, null=True, blank=True,related_name="products")
     brand = ForeignKey('apps.Brand', SET_NULL, null=True, blank=True)
     country = ForeignKey("apps.Country", SET_NULL, null=True, blank=True)
 
@@ -62,7 +62,7 @@ class ProductImage(ImageBaseModel):
     product = ForeignKey('apps.Product', CASCADE, related_name='images')
 
 
-class ProductVideo(ModelBase):
+class ProductVideo(Model):
     product = ForeignKey('apps.Product', CASCADE, related_name='videos')
     video = VideoField(upload_to=upload_to_image,
                        validators=[FileExtensionValidator(['mp4', 'avi', 'mov', 'mkv'], validate_video)])

@@ -127,7 +127,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         fields = ['price', 'stock', 'attributes_cache',]
 
 class ProductListSerializer(ModelSerializer):
-    starting_price = DecimalField(source='product.price', decimal_places=2, read_only=True)
+    starting_price = DecimalField(max_digits=15, decimal_places=2, read_only=True)
     brand_name = serializers.CharField(source='brand.name', read_only=True)
 
     class Meta:

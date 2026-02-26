@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.views import (CityListAPIView, DeliveryPointsListAPIView, DeliveryPointsRetrieveAPIView, ChatHistoryView,
                         ImageUploadView, ProductViewSet, ChatRoomListView, ChatRoomGetOrCreateView, )
-from apps.users.views import (QRCodeLoginRequestView,QRCodeLoginAuthorizeView,QRCodeLoginStatusView,)
+from apps.views import (QRCodeLoginRequestView,QRCodeLoginAuthorizeView,QRCodeLoginStatusView,)
 
 urlpatterns = [
     # Auth & JWT
@@ -27,5 +27,5 @@ urlpatterns = [
     path("upload-image/", ImageUploadView.as_view(), name="chat_image_upload"),
 
     #Filter
-    path("", ProductViewSet.as_view(), name="products_list"),
+    # path("", ProductViewSet.as_view(), name="products_list"),
 ]

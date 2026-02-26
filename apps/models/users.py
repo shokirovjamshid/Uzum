@@ -68,7 +68,7 @@ class Seller(User):
 
     business_type = IntegerField(choices=BusinessType.choices, null=True, blank=True)
     balance = IntegerField(default=0)
-    store = ForeignKey('apps.Store', CASCADE, related_name='sellers')
+    business_store = ForeignKey('apps.Store', CASCADE, related_name='sellers')
 
 
 

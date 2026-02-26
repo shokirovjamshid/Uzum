@@ -28,7 +28,6 @@
 #     serializer_class = DeliveryPointsRetrieveModelSerializer
 
 import uuid
-
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
@@ -47,7 +46,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.consumers.CustomPagination import ChatHistoryPagination
+from apps.consumers.custom_pagination import ChatHistoryPagination
 from apps.filters import ProductFilter
 from apps.models import City, DeliveryPoint, User, Message, Product, ProductVariantModel, ChatRoom
 from apps.models.users import Store
@@ -59,7 +58,7 @@ from apps.serializers import (
     ProductListSerializer, ProductReadSerializer, ProductCreateSerializer, ProductUpdateSerializer,
     ProductDeleteSerializer,
 )
-from utils import _generate_qr_image_base64
+from apps.utils import _generate_qr_image_base64
 
 signer = TimestampSigner()
 
