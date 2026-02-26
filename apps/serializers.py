@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, DecimalField, IntegerField
 from rest_framework.serializers import ModelSerializer, Serializer
 
-from apps.models import City, DeliveryPoint, Weekday, ChatRoom, Message, Product
+from apps.models import City, DeliveryPoint, Weekday, ChatRoom, Message, Product, ProductVariantModel
 
 
 class CityListModelSerializer(ModelSerializer):
@@ -121,8 +121,13 @@ class QRLoginStatusResponseSerializer(Serializer):
         return data
 
 
+class ProductVariantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariantModel
+        fields = ['price', 'stock', 'attributes_cache',]
+
 class ProductListSerializer(ModelSerializer):
-    starting_price = DecimalField(max_digits=15, decimal_places=2, read_only=True)
+    starting_price = DecimalField(source='product.price', decimal_places=2, read_only=True)
     brand_name = serializers.CharField(source='brand.name', read_only=True)
 
     class Meta:
@@ -146,15 +151,65 @@ class ProductReadSerializer(ModelSerializer):
             "variant_slug": v.variant_slug
         } for v in variants]
 
-class ProductCreateSerializer(ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['name_uz', 'slug', 'category', 'brand']
 
-class ProductUpdateSerializer(ModelSerializer):
+class ProductCreateSerializer(serializers.ModelSerializer):
+    variants = ProductVariantSerializer(many=True)
+
     class Meta:
         model = Product
-        fields = ['name_uz', 'category', 'brand']
+        fields = ['name_uz', 'slug', 'category', 'brand', 'variants']
+
+    def create(self, validated_data):
+        variants_data = validated_data.pop('variants')
+        product = Product.objects.create(**validated_data)
+        variant_objs = [
+            ProductVariantModel(product=product, **variant_data)
+            for variant_data in variants_data
+        ]
+        ProductVariantModel.objects.bulk_create(variant_objs)
+        return product
+
+class VariantUpdateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = ProductVariantModel
+        fields = ['id', 'price', 'stock', 'attributes_cache', ]
+class ProductUpdateSerializer(serializers.ModelSerializer):
+    variants = ProductVariantSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ['name_uz', 'slug', 'category', 'brand', 'variants']
+
+    def update(self, instance, validated_data):
+        variants_data = validated_data.pop('variants', [])
+        instance.name_uz = validated_data.get('name_uz', instance.name_uz)
+        instance.category = validated_data.get('category', instance.category)
+        instance.brand = validated_data.get('brand', instance.brand)
+        instance.save()
+
+        existing_variants = {v.id: v for v in instance.variants.all()}
+        new_variants_to_create = []
+
+        for variant_item in variants_data:
+            variant_id = variant_item.get('id')
+
+            if variant_id and variant_id in existing_variants:
+                v_instance = existing_variants.pop(variant_id)
+                for attr, value in variant_item.items():
+                    setattr(v_instance, attr, value)
+                v_instance.save()
+            else:
+                new_variants_to_create.append(
+                    ProductVariantModel(product=instance, **variant_item)
+                )
+
+        if existing_variants:
+            ProductVariantModel.objects.filter(id__in=existing_variants.keys()).delete()
+        if new_variants_to_create:
+            ProductVariantModel.objects.bulk_create(new_variants_to_create)
+        return instance
 
 class ProductDeleteSerializer(serializers.ModelSerializer):
     class Meta:
