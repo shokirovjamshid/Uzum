@@ -14,9 +14,9 @@ class ProductModel(SlugBaseModel):
 
 
 class Country(Model):
-    name_uz = CharField(max_length=100)
+    name = CharField(max_length=100)
 
 
-class Color(Model):
+class Color(SlugBaseModel):
     name = CharField(max_length=50)
     category = ManyToManyField('Category', related_name='colors')

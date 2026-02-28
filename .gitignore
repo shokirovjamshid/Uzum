@@ -104,9 +104,7 @@ __pypackages__/
 celerybeat-schedule
 celerybeat.pid
 *.sage.py
-.env
 env/
-**migrations**
 venv/
 ENV/
 env.bak/

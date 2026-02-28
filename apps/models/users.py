@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
-from django.db.models import CharField, IntegerChoices, ImageField, IntegerField, EmailField, TextChoices
+from django.db.models import CharField, IntegerChoices, ImageField, IntegerField, EmailField, TextChoices, OneToOneField
 from django.db.models import Model, ForeignKey, CASCADE
 from django.db.models.fields import BooleanField, DateField
 from django_ckeditor_5.fields import CKEditor5Field
@@ -13,7 +13,6 @@ from apps.managers import (
 )
 from apps.models.base import ImageBaseModel, SlugBaseModel
 from apps.models.utils import uz_phone_validator, upload_to_image, upload_image_size_5mb_validator
-
 
 
 class User(AbstractUser, ImageBaseModel):
@@ -60,16 +59,17 @@ class Store(ImageBaseModel, SlugBaseModel):
     is_online = BooleanField(default=False)
 
 
-class Seller(User):
+class Seller(Model):
     class BusinessType(IntegerChoices):
         YATT = 1, 'YATT'
         NOT_CONFIRMED = 2, 'NOT_CONFIRMED'
         LEGAL_ENTITY = 3, 'LEGAL ENTITY'
-
+    email = EmailField(unique=True, null=True, blank=True)
+    user = OneToOneField("apps.User", on_delete=CASCADE, related_name='seller_profile')
     business_type = IntegerField(choices=BusinessType.choices, null=True, blank=True)
     balance = IntegerField(default=0)
     business_store = ForeignKey('apps.Store', CASCADE, related_name='sellers')
-
+    password = CharField(max_length=255, null=True, blank=True, verbose_name="Seller's password")
 
 
 class QuestionCategory(Model):

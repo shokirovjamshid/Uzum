@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     # "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
     # "unfold.contrib.location_field",  # optional, if django-location-field package is used
     # "unfold.contrib.constance",  # optional, if django-constance package is used
-'django.contrib.postgres',
+    'django.contrib.postgres',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

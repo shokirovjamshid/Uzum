@@ -28,6 +28,7 @@
 #     serializer_class = DeliveryPointsRetrieveModelSerializer
 
 import uuid
+
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
@@ -243,6 +244,7 @@ class ChatHistoryView(ListAPIView):
 
         return qs.order_by("-timestamp")
 
+
 @extend_schema(tags=["product"])
 class ProductListAPIView(ListAPIView):
     queryset = Product.objects.all()
@@ -252,6 +254,7 @@ class ProductListAPIView(ListAPIView):
         return Product.objects.annotate(
             starting_price=Min('variants__price')
         ).select_related('brand').order_by('-id')
+
 
 @extend_schema(tags=["product"])
 class ProductReadAPIView(RetrieveAPIView):
@@ -264,6 +267,7 @@ class ProductReadAPIView(RetrieveAPIView):
             Prefetch('variants', queryset=ProductVariantModel.objects.all(), to_attr='all_variants')
         )
 
+
 @extend_schema(tags=["product"])
 class ProductCreateAPIView(CreateAPIView):
     queryset = Product.objects.all()
@@ -272,17 +276,20 @@ class ProductCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+
 @extend_schema(tags=["product"])
 class ProductDeleteAPIView(DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductDeleteSerializer
     lookup_field = 'id'
 
+
 @extend_schema(tags=["product"])
 class ProductUpdateAPIView(UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductUpdateSerializer
     lookup_field = 'id'
+
 
 @extend_schema(tags=["Filter"])
 class ProductViewSet(ReadOnlyModelViewSet):
