@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.views import (CityListAPIView, DeliveryPointsListAPIView, DeliveryPointsRetrieveAPIView, ChatHistoryView,
-                        ImageUploadView, ProductViewSet, ChatRoomListView, ChatRoomGetOrCreateView, )
+                        ImageUploadView, ChatRoomListView, ChatRoomGetOrCreateView, )
 from apps.views import (QRCodeLoginRequestView,QRCodeLoginAuthorizeView,QRCodeLoginStatusView,)
 
 urlpatterns = [
@@ -27,5 +27,4 @@ urlpatterns = [
     path("upload-image/", ImageUploadView.as_view(), name="chat_image_upload"),
 
     #Filter
-    # path("", ProductViewSet.as_view(), name="products_list"),
 ]

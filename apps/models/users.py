@@ -64,6 +64,7 @@ class Seller(Model):
         YATT = 1, 'YATT'
         NOT_CONFIRMED = 2, 'NOT_CONFIRMED'
         LEGAL_ENTITY = 3, 'LEGAL ENTITY'
+
     email = EmailField(unique=True, null=True, blank=True)
     user = OneToOneField("apps.User", on_delete=CASCADE, related_name='seller_profile')
     business_type = IntegerField(choices=BusinessType.choices, null=True, blank=True)
