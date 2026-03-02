@@ -20,7 +20,6 @@
 #         'sku': TextField(),
 #         'price': DoubleField(),
 #         'attributes_data': ObjectField(),
-#         'stock': IntegerField(),
 #     })
 #
 #     class Index:

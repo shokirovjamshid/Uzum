@@ -32,6 +32,7 @@ dependencies = [
     "daphne>=4.2.1",
     "utils",
     "celery-types>=0.24.0",
+    "django-jsonform>=2.23.2",
 ]
 
 [dependency-groups]
