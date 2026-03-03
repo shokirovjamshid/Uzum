@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'django_filters',
     # 'django_elasticsearch_dsl',
     # 'django_elasticsearch_dsl_drf',
-    'django.contrib.postgres',
+
 
 ]
 
@@ -82,9 +82,7 @@ ROOT_URLCONF = 'root.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"]
-        ,
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -110,7 +108,7 @@ DATABASES = {
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'PORT': os.getenv('POSTGRES_PORT'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'CONN_MAX_AGE': 0,
+        # 'CONN_MAX_AGE': 0,
     }
 }
 
@@ -176,6 +174,12 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'uzum market clone api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'docExpansion': 'none',
+        'deepLinking': True,
+        'filter': True,
+    },
+
 }
 
 REST_FRAMEWORK = {
@@ -222,3 +226,4 @@ UNFOLD = {
         "show_all_applications": True,
     }
 }
+

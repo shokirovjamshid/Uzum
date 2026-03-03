@@ -2,7 +2,9 @@ from rest_framework import serializers
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField
 from rest_framework.serializers import ModelSerializer, Serializer
 
-from apps.models import City, DeliveryPoint, Weekday, ChatRoom, Message
+from apps.models import City, DeliveryPoint, Weekday
+from apps.models.chats import Message, ChatRoom
+
 
 
 class CityListModelSerializer(ModelSerializer):

@@ -3,7 +3,7 @@ import os
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 
-from apps.middleware import JWTAuthMiddleware
+from root.middleware import JWTAuthMiddleware
 from root.routing import websocket_urlpatterns
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "root.settings")

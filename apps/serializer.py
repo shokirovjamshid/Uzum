@@ -79,7 +79,7 @@ class RegisterSerializer(ModelSerializer):
 class ProductListSerializer(ModelSerializer):
     class Meta:
         model = Product
-        fields = 'name', 'rating', 'comment_count',
+        fields = 'name', 'rating', 'comments_count',
 
     def to_representation(self, instance: Product):
         re = super().to_representation(instance)

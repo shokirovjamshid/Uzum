@@ -3,12 +3,6 @@ from django.db.models import CharField, IntegerChoices, ImageField, IntegerField
 from django.db.models import Model, ForeignKey, CASCADE
 from django.db.models.fields import BooleanField, DateField
 from django.db.models.fields import FloatField, PositiveIntegerField, TextField
-
-from apps.managers import (
-    AdminUserManager,
-    SellerUserManager,
-    CustomerUserManager,
-)
 from apps.managers import CustomUserManager, SellerCustomManager, ManagerCustomManager, AdminCustomManager
 from apps.models.base import CreatedBaseModel
 from apps.models.base import ImageBaseModel
@@ -44,7 +38,6 @@ class User(AbstractUser, ImageBaseModel):
     @property
     def is_admin(self):
         return self.type == self.TypeChoice.ADMIN or self.is_superuser
-
 
 
 class Seller(CreatedBaseModel):

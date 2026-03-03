@@ -1,28 +1,30 @@
-from apps.consumers.custom_pagination import ChatHistoryPagination
+import uuid
+
 from django.core.cache import cache
+from django.core.files.storage import default_storage
+from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
+from django.db.models import Count, Q, Prefetch
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import CreateAPIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.models import City, DeliveryPoint, Category, User, Product
-from apps.models import Message, ChatRoom
-from apps.models.users import Store
+from apps.models import City, DeliveryPoint, Category, User, Product, Shop
+from apps.models.chats import ChatRoom, Message
 from apps.serializer import CityListModelSerializer, DeliveryPointsListModelSerializer, \
     DeliveryPointsRetrieveModelSerializer, CategorySerializer, RegisterSerializer, ProductListSerializer
 from apps.serializers import (
     QRLoginStatusResponseSerializer, QRLoginRequestResponseSerializer,
-    QRLoginAuthorizeRequestSerializer, MessageSerializer, ChatRoomListSerializer,
-
+    QRLoginAuthorizeRequestSerializer, MessageSerializer, ChatRoomListSerializer, )
 from apps.tasks import register_sms, register_key
-
-)
 from apps.utils import _generate_qr_image_base64
 
 signer = TimestampSigner()
@@ -212,8 +214,8 @@ class ChatRoomGetOrCreateView(GenericAPIView):
     def post(self, request, store_id):
         user = request.user
         try:
-            store = Store.objects.get(id=store_id)
-        except Store.DoesNotExist:
+            store = Shop.objects.get(id=store_id)
+        except Shop.DoesNotExist:
             return Response({"error": "Store topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
         room, created = ChatRoom.objects.get_or_create(buyer=user, store=store)
@@ -225,7 +227,7 @@ class ChatRoomGetOrCreateView(GenericAPIView):
 class ChatHistoryView(ListAPIView):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
-    pagination_class = ChatHistoryPagination
+    pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     queryset = Message.objects.all()
 

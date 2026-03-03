@@ -8,3 +8,4 @@ from apps.models.carts import Cart, CartItem
 from apps.models.favorites import Favorite
 from apps.models.orders import Order, OrderItem, PaymentType, CustomerRecipient
 from apps.models.comments import Comment, CommentImage
+from apps.models.chats import Message, ChatRoom
