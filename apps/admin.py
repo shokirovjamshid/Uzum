@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from unfold.admin import ModelAdmin, StackedInline
+from unfold.admin import ModelAdmin
 
-from apps.models import City, DaysWeek, User, Weekday, WeekdaysInfo, DeliveryPoint
+from apps.models import City, DaysWeek, User, Category
 
 
 @admin.register(User)
@@ -43,6 +43,12 @@ class CustomUserAdmin(ModelAdmin):
 class CityAdmin(ModelAdmin):
     pass
 
+
 @admin.register(DaysWeek)
 class DaysWeekAdmin(ModelAdmin):
+    pass
+
+
+@admin.register(Category)
+class CategoryAdmin(ModelAdmin):
     pass

@@ -43,11 +43,15 @@ INSTALLED_APPS = [
     'apps',
 
     # online apps
+    'django_jsonform',
     'drf_spectacular',
     'rest_framework_simplejwt',
     'django_celery_beat',
     'location_field',
     'django_filters',
+    # 'django_elasticsearch_dsl',
+    # 'django_elasticsearch_dsl_drf',
+    'django.contrib.postgres',
 
 ]
 
@@ -61,12 +65,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
 ROOT_URLCONF = 'root.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
+        'DIRS': [BASE_DIR / "templates"]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -92,6 +103,7 @@ DATABASES = {
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'PORT': os.getenv('POSTGRES_PORT'),
         'HOST': os.getenv('POSTGRES_HOST'),
+        'CONN_MAX_AGE': 0,
     }
 }
 

@@ -7,7 +7,7 @@ from django.core.validators import FileExtensionValidator
 from django.db.models import Model, SlugField, DateTimeField, ImageField
 from django.utils.text import slugify
 
-from apps.models.utils import upload_to_image, upload_image_size_5mb_validator
+from apps.models.utils import upload_to_image, validate_image, upload_image_size_5mb_validator
 
 
 class SlugBaseModel(Model):
@@ -34,8 +34,7 @@ class CreatedBaseModel(Model):
 
 class ImageBaseModel(Model):
     image = ImageField(upload_to=upload_to_image, null=True, blank=True,
-                       validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-                                   upload_image_size_5mb_validator],
+                       validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),upload_image_size_5mb_validator],
                        help_text="Hajmi 5 mb dan oshmasin va 3x4 bo'lishi kerak.Orqa fon oq bo'lishi kerak")
 
     def convert_img_to_webp(self):

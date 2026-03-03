@@ -1,5 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager
+from django.db.models import Manager
 
 
 class CustomUserManager(UserManager):
@@ -36,3 +37,50 @@ class CustomUserManager(UserManager):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(phone, email, password, **extra_fields)
+
+
+class SellerCustomManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(type="seller")
+
+    def create_seller(self, phone, email, password, **extra_fields):
+        extra_fields.setdefault("type", "seller")
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self.model.objects.create_user(
+            phone=phone,
+            email=email,
+            password=password,
+            **extra_fields
+        )
+
+
+class AdminCustomManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(type="admin")
+
+    def create_admin(self, phone, email, password, **extra_fields):
+        extra_fields.setdefault("type", "admin")
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self.model.objects.create_user(
+            phone=phone,
+            email=email,
+            password=password,
+            **extra_fields
+        )
+
+
+class ManagerCustomManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(type="manager")
+
+    def create_manager(self, phone, email=None, **extra_fields):
+        extra_fields.setdefault("type", "manager")
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self.model.objects.create_user(
+            phone=phone,
+            email=email,
+            **extra_fields
+        )

@@ -1,0 +1,89 @@
+
+
+Orders table: Partition
+    description:
+        Vaqt bo'yicha yangi table yaratadi. Bu filter qilyotgandan hamma tabledan olib kelmasadan
+        ma'lum bir parent tabledan olib keladi.
+
+    action to be taken:
+        1)
+            class Order(models.Model):
+                user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+                total_amount = models.DecimalField(max_digits=12, decimal_places=2)
+                status = models.CharField(max_length=20)
+                created_at = models.DateTimeField()
+
+                class Meta:
+                    db_table = "orders"
+                    managed = False   # 🔥 juda muhim
+        2)
+            python manage.py makemigrations
+
+        3)
+            from django.db import migrations
+
+            class Migration(migrations.Migration):
+
+                dependencies = []
+
+                operations = [
+                    migrations.RunSQL(
+                        """
+                        -- Parent table (hash partition uchun)
+                        CREATE TABLE IF NOT EXISTS orders (
+                            id BIGSERIAL PRIMARY KEY,
+                            user_id BIGINT NOT NULL,
+                            total_amount NUMERIC(12,2),
+                            status VARCHAR(20),
+                            created_at TIMESTAMP NOT NULL
+                        ) PARTITION BY HASH (user_id);
+
+                        -- Initial hash partitions (4 ta misol)
+                        CREATE TABLE IF NOT EXISTS orders_p0 PARTITION OF orders
+                        FOR VALUES WITH (MODULUS 4, REMAINDER 0);
+
+                        CREATE TABLE IF NOT EXISTS orders_p1 PARTITION OF orders
+                        FOR VALUES WITH (MODULUS 4, REMAINDER 1);
+
+                        CREATE TABLE IF NOT EXISTS orders_p2 PARTITION OF orders
+                        FOR VALUES WITH (MODULUS 4, REMAINDER 2);
+
+                        CREATE TABLE IF NOT EXISTS orders_p3 PARTITION OF orders
+                        FOR VALUES WITH (MODULUS 4, REMAINDER 3);
+
+                        -- Indexlar
+                        CREATE INDEX IF NOT EXISTS idx_orders_user ON orders (user_id);
+                        CREATE INDEX IF NOT EXISTS idx_orders_status ON orders (status);
+                        CREATE INDEX IF NOT EXISTS idx_orders_created ON orders (created_at);
+                        """
+                    )
+                ]
+            4)
+                python manage.py migrate
+
+            # 5)
+
+                # tasks.py
+                from datetime import datetime, timedelta
+                from django.db import connection
+                from celery import shared_task
+
+                @shared_task
+                def create_monthly_order_partition():
+                    # Keyingi oy
+                    today = datetime.today()
+                    next_month = (today.replace(day=1) + timedelta(days=32)).replace(day=1)
+                    table_name = f"orders_{next_month.year}_{next_month.month:02d}"
+
+                    # Keyingi oy oxiri (exclusive)
+                    following_month = (next_month + timedelta(days=32)).replace(day=1)
+
+                    sql = f"""
+                    CREATE TABLE IF NOT EXISTS {table_name} PARTITION OF orders
+                    FOR VALUES FROM ('{next_month.date()}') TO ('{following_month.date()}');
+                    """
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql)
+
+    ORM muhim joylari:
+        Order.objects.filter(created_at__year=2026)

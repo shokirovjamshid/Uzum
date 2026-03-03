@@ -1,24 +1,33 @@
-from django.db.models import Model, CharField, ForeignKey, CASCADE, ManyToManyField
+from django.db.models import Model, CharField, ForeignKey, CASCADE
 
 
 class ProductModel(Model):
     name = CharField(max_length=50)
-    category = ManyToManyField('Category',related_name='models')
 
 
 class Brand(Model):
     title = CharField(max_length=100)
-    category = ManyToManyField('Category', related_name='brands')
+
 
 class Country(Model):
     name = CharField(max_length=50)
-    category = ManyToManyField('Category', related_name='countries')
 
 
-class Color(Model):
-    name = CharField(max_length=50)
-    category = ManyToManyField('Category', related_name='colors')
+class FeatureValue(Model):
+    title = CharField(max_length=50)
+    value = CharField(max_length=50)
 
-class Ram(Model):
-    name = CharField(max_length=50)
-    category = ManyToManyField('Category', related_name='rams')
+
+class ProductFeature(Model):
+    product = ForeignKey('apps.Product', CASCADE, related_name='new_features')
+    feature = ForeignKey('apps.Feature', CASCADE, related_name='product_features')
+
+
+class Feature(Model):
+    title = CharField(max_length=100)
+    type = CharField(max_length=50)
+
+
+class FeatureItem(Model):
+    feature = ForeignKey('apps.Feature', CASCADE, related_name='feature_items')
+    feature_value = ForeignKey('apps.FeatureValue', CASCADE)
