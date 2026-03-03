@@ -21,8 +21,8 @@ class ChatRoom(Model):
 
 
 class Message(Model):
-    chat = ForeignKey(ChatRoom, CASCADE, related_name="messages")
-    sender = ForeignKey(settings.AUTH_USER_MODEL, CASCADE, related_name="sent_messages")
+    chat = ForeignKey("apps.ChatRoom", CASCADE, related_name="messages")
+    sender = ForeignKey("apps.User", CASCADE, related_name="sent_messages")
     text = TextField(null=True, blank=True)
     image_url = URLField(null=True, blank=True)
 
