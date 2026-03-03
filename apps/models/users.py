@@ -1,15 +1,21 @@
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField, TextChoices, DateField, IntegerChoices, EmailField, IntegerField, ForeignKey, \
-    CASCADE, OneToOneField, ImageField
+from django.db.models import CharField, IntegerChoices, ImageField, IntegerField, EmailField, TextChoices, OneToOneField
+from django.db.models import Model, ForeignKey, CASCADE
+from django.db.models.fields import BooleanField, DateField
 from django.db.models.fields import FloatField, PositiveIntegerField, TextField
 
+from apps.managers import (
+    AdminUserManager,
+    SellerUserManager,
+    CustomerUserManager,
+)
 from apps.managers import CustomUserManager, SellerCustomManager, ManagerCustomManager, AdminCustomManager
-from apps.models.base import CreatedBaseModel, ImageBaseModel
+from apps.models.base import CreatedBaseModel
+from apps.models.base import ImageBaseModel
 from apps.models.utils import uz_phone_validator
 
 
-class User(AbstractUser, CreatedBaseModel):
+class User(AbstractUser, ImageBaseModel):
     class TypeChoice(TextChoices):
         ADMIN = 'admin', 'Admin'
         USER = 'user', 'User'
@@ -23,6 +29,7 @@ class User(AbstractUser, CreatedBaseModel):
     email = EmailField(unique=True, null=True, blank=True)
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
     password = CharField(max_length=128, null=True, blank=True)
+    is_online = BooleanField(default=False)
     patronymic = CharField(max_length=30, null=True, blank=True)
     type = CharField(max_length=12, choices=TypeChoice.choices, default=TypeChoice.USER)
     gender = IntegerField(null=True, blank=True, choices=Gender.choices, help_text='True Male False Female')
@@ -37,6 +44,7 @@ class User(AbstractUser, CreatedBaseModel):
     @property
     def is_admin(self):
         return self.type == self.TypeChoice.ADMIN or self.is_superuser
+
 
 
 class Seller(CreatedBaseModel):

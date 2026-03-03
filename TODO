@@ -63,8 +63,8 @@ Tovar orqafoni:#efefef
 foreign keylar slug + id bilan
 
 Task:
-1.Topshirish punktini belgilash(ishlash vaqtlari bilan)
-2.Savol va javoblar
+1.Topshirish punktini belgilash(ishlash vaqtlari bilan) ✅
+2.Savol va javoblar ✅
 3.Ko'ptillik
 4.Hamma tovarlarni ko'rish ko'rish
 5.Selenium orqali uzumni katalogini ko'chiramiz
@@ -72,3 +72,17 @@ Task:
 
 
 
+
+5.Selenium orqali uzumni katalogini ko'chiramiz ✅
+6.Elasticsearch qo'shish alohida texnalogiya
+7.Argon database
+8.Register yoki login qilgan user boshqa joyda login qilsa QR-Code Chiqsin ✅
+9.Input JS ✅
+10.Querysetni to'g'irlash ya'ni (User.admins.all())desak faqat adminlarni yoki (User.users.all()) desak userlarni olib kelishi kerak ✅
+12.Faqat sellerda balance bor
+13.CategoryImage qo'shish kerak
+14.Ishlab chiqirlgan mamalakat ✅
+15.User modelni bo'lish ✅
+16.Postgres ni bo'lish (pgpool) bilan high load uchun
+17.Meta base dashboard uchun caddy
+get_ttl
