@@ -1,6 +1,6 @@
 from django.db.models import ForeignKey, SET_NULL, CASCADE, CharField, Model, BigIntegerField, SlugField, \
     FileField, UniqueConstraint
-from django.db.models.fields import PositiveSmallIntegerField, PositiveBigIntegerField
+from django.db.models.fields import PositiveSmallIntegerField, PositiveBigIntegerField, FloatField
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jsonform.models.fields import JSONField
 
@@ -10,17 +10,20 @@ from apps.models.utils import validate_video
 
 class Product(CreatedBaseModel):
     name = CharField(max_length=90)
-    category = ForeignKey('apps.Category', on_delete=CASCADE,related_name='products')
-    guarantee = PositiveSmallIntegerField(null=True,blank=True,default=6)
-    shop = ForeignKey('apps.Store',CASCADE,related_name='products')
+    category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
+    guarantee = PositiveSmallIntegerField(null=True, blank=True, default=6)
+    shop = ForeignKey('apps.Store', CASCADE, related_name='products')
     # tovar belgisi
     model = ForeignKey('apps.ProductModel', on_delete=SET_NULL, related_name='products', null=True, blank=True)
     brand = ForeignKey('apps.Brand', on_delete=SET_NULL, related_name='products', null=True, blank=True)
     country = ForeignKey('apps.Country', on_delete=SET_NULL, related_name='products', null=True, blank=True)
     description = CKEditor5Field()
     sku = CharField(max_length=100)
+    comments_count = PositiveSmallIntegerField(default=0)
+    price = BigIntegerField()
     # 360 gradusli rasm
     short_description = CharField(max_length=390)
+    rating = FloatField(default=0)
 
     class Meta:
         constraints = [
