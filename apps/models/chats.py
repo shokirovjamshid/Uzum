@@ -7,17 +7,17 @@ from django.utils import timezone
 class ChatRoom(Model):
 
     buyer = ForeignKey(settings.AUTH_USER_MODEL,CASCADE,related_name="customer_chats",limit_choices_to={'type': 'user'},db_index=True)
-    store = ForeignKey('apps.Store',CASCADE,related_name="store_chats",db_index=True)
+    shop = ForeignKey('apps.Shop',CASCADE,related_name="shop_chats",db_index=True)
 
     last_message_at = DateTimeField(default=timezone.now, db_index=True)
     created_at = DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('buyer', 'store')
+        unique_together = ('buyer', 'shop')
         ordering = ['-last_message_at']
 
     def __str__(self):
-        return f"Chat: {self.buyer.phone} <-> {self.store.name}"
+        return f"Chat: {self.buyer.phone} <-> {self.shop.name}"
 
 
 class Message(Model):

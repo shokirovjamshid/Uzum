@@ -1,18 +1,12 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import FileExtensionValidator
 from django.db.models import CharField, IntegerChoices, ImageField, IntegerField, EmailField, TextChoices, OneToOneField
 from django.db.models import Model, ForeignKey, CASCADE
 from django.db.models.fields import BooleanField, DateField
-from django_ckeditor_5.fields import CKEditor5Field
-
-from apps.managers import (
-    UserManager,
-    AdminUserManager,
-    SellerUserManager,
-    CustomerUserManager,
-)
-from apps.models.base import ImageBaseModel, SlugBaseModel
-from apps.models.utils import uz_phone_validator, upload_to_image, upload_image_size_5mb_validator
+from django.db.models.fields import FloatField, PositiveIntegerField, TextField
+from apps.managers import CustomUserManager, SellerCustomManager, ManagerCustomManager, AdminCustomManager
+from apps.models.base import CreatedBaseModel
+from apps.models.base import ImageBaseModel
+from apps.models.utils import uz_phone_validator
 
 
 class User(AbstractUser, ImageBaseModel):
@@ -28,62 +22,33 @@ class User(AbstractUser, ImageBaseModel):
 
     email = EmailField(unique=True, null=True, blank=True)
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
+    password = CharField(max_length=128, null=True, blank=True)
     is_online = BooleanField(default=False)
     patronymic = CharField(max_length=30, null=True, blank=True)
-    type = CharField(max_length=12, choices=TypeChoice.choices, )
-    gender = BooleanField(null=True, blank=True, choices=Gender.choices, help_text='True Male False Female')
+    type = CharField(max_length=12, choices=TypeChoice.choices, default=TypeChoice.USER)
+    gender = IntegerField(null=True, blank=True, choices=Gender.choices, help_text='True Male False Female')
     birth_date = DateField(null=True, blank=True)
-
     username = None
-    password = None
-
     USERNAME_FIELD = "phone"
-
-    objects = UserManager()
-    admins = AdminUserManager()
-    sellers = SellerUserManager()
-    customers = CustomerUserManager()
+    objects = CustomUserManager()
+    sellers = SellerCustomManager()
+    managers = ManagerCustomManager()
+    admins = AdminCustomManager()
 
     @property
     def is_admin(self):
         return self.type == self.TypeChoice.ADMIN or self.is_superuser
 
 
-class Store(ImageBaseModel, SlugBaseModel):
-    name = CharField(max_length=50, )
-    banner = ImageField(upload_to=upload_to_image, null=True, blank=True,
-                        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-                                    upload_image_size_5mb_validator],
-                        help_text="Hajmi 5 mb dan oshmasin")
-    product_quantity = IntegerField(null=True, blank=True, default=0)
-    is_online = BooleanField(default=False)
+class Seller(CreatedBaseModel):
+    user = OneToOneField('apps.User', CASCADE, related_name='seller')
 
 
-class Seller(Model):
-    class BusinessType(IntegerChoices):
-        YATT = 1, 'YATT'
-        NOT_CONFIRMED = 2, 'NOT_CONFIRMED'
-        LEGAL_ENTITY = 3, 'LEGAL ENTITY'
-
-    email = EmailField(unique=True, null=True, blank=True)
-    user = OneToOneField("apps.User", on_delete=CASCADE, related_name='seller_profile')
-    business_type = IntegerField(choices=BusinessType.choices, null=True, blank=True)
-    balance = IntegerField(default=0)
-    business_store = ForeignKey('apps.Store', CASCADE, related_name='sellers')
-    password = CharField(max_length=255, null=True, blank=True, verbose_name="Seller's password")
-
-
-class QuestionCategory(Model):
-    question = CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.question}"
-
-
-class Answer(Model):
-    question_category = ForeignKey('apps.QuestionCategory', CASCADE, related_name='answers')
-    question = CKEditor5Field(max_length=255)
-    answer = CKEditor5Field()
-
-    def __str__(self):
-        return f"{self.question}"
+class Shop(CreatedBaseModel, ImageBaseModel):
+    name = CharField(max_length=125)
+    seller = ForeignKey('apps.Seller', CASCADE, related_name='shops')
+    description = TextField(null=True, blank=True)
+    banner = ImageField(upload_to='seller/banner/%Y/%m/%d', null=True, blank=True)
+    rating = FloatField(default=0)
+    comment_count = PositiveIntegerField(default=0)
+    order_count = PositiveIntegerField(default=0)

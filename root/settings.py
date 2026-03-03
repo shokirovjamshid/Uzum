@@ -25,15 +25,15 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     "daphne",
-    # "unfold",
-    # "unfold.contrib.filters",
-    # "unfold.contrib.forms",  # optional, if special form elements are needed
-    # "unfold.contrib.inlines",  # optional, if special inlines are needed
-    # "unfold.contrib.import_export",  # optional, if django-import-export package is used
-    # "unfold.contrib.guardian",  # optional, if django-guardian package is used
-    # "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
-    # "unfold.contrib.location_field",  # optional, if django-location-field package is used
-    # "unfold.contrib.constance",  # optional, if django-constance package is used
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
+    "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "unfold.contrib.location_field",  # optional, if django-location-field package is used
+    "unfold.contrib.constance",  # optional, if django-constance package is used
     'django.contrib.postgres',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,11 +48,15 @@ INSTALLED_APPS = [
     'channels',
     'rest_framework',
     # online apps
+    'django_jsonform',
     'drf_spectacular',
     'rest_framework_simplejwt',
     'django_celery_beat',
     'location_field',
     'django_filters',
+    # 'django_elasticsearch_dsl',
+    # 'django_elasticsearch_dsl_drf',
+
 
 ]
 
@@ -66,12 +70,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
 ROOT_URLCONF = 'root.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,6 +108,7 @@ DATABASES = {
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'PORT': os.getenv('POSTGRES_PORT'),
         'HOST': os.getenv('POSTGRES_HOST'),
+        # 'CONN_MAX_AGE': 0,
     }
 }
 
@@ -116,13 +128,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-]
-
-PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.Argon2PasswordHasher",
-    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
-    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
 ]
 
 # Internationalization
@@ -169,6 +174,12 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'uzum market clone api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'docExpansion': 'none',
+        'deepLinking': True,
+        'filter': True,
+    },
+
 }
 
 REST_FRAMEWORK = {
@@ -215,3 +226,4 @@ UNFOLD = {
         "show_all_applications": True,
     }
 }
+

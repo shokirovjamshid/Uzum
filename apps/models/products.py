@@ -12,7 +12,7 @@ class Product(CreatedBaseModel):
     name = CharField(max_length=90)
     category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
     guarantee = PositiveSmallIntegerField(null=True, blank=True, default=6)
-    shop = ForeignKey('apps.Store', CASCADE, related_name='products')
+    shop = ForeignKey('apps.Shop', CASCADE, related_name='products')
     # tovar belgisi
     model = ForeignKey('apps.ProductModel', on_delete=SET_NULL, related_name='products', null=True, blank=True)
     brand = ForeignKey('apps.Brand', on_delete=SET_NULL, related_name='products', null=True, blank=True)
@@ -54,3 +54,5 @@ class ProductVideo(Model):
     video = FileField(upload_to='product/videos/%Y/%m/%d', null=True, blank=True, validators=[validate_video])
     product_item = ForeignKey('apps.ProductItem', CASCADE, related_name='videos', blank=True, null=True)
     product = ForeignKey('apps.Product', CASCADE, related_name='videos', blank=True, null=True)
+
+

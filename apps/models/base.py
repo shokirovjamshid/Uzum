@@ -62,6 +62,7 @@ class ImageBaseModel(Model):
 class UserQuerySet(QuerySet):
     def admins(self):
         return self.filter(user__is_superuser=True)
+
     @property
     def users(self):
         return self.filter(type='user')

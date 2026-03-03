@@ -1,95 +1,100 @@
-# from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework.filters import SearchFilter
-# from rest_framework.generics import ListAPIView, RetrieveAPIView
-#
-# from apps.models import City, DeliveryPoint
-# from apps.serializer import CityListModelSerializer, DeliveryPointsListModelSerializer, \
-#     DeliveryPointsRetrieveModelSerializer
-#
-#
-# # Create your views here.
-#
-# class CityListAPIView(ListAPIView):
-#     queryset = City.objects.all()
-#     serializer_class = CityListModelSerializer
-#     filter_backends = [SearchFilter]
-#     search_fields = ['name']
-#
-#
-# class DeliveryPointsListAPIView(ListAPIView):
-#     queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location')
-#     serializer_class = DeliveryPointsListModelSerializer
-#     filter_backends = [DjangoFilterBackend]
-#     filterset_fields = ['city']
-#
-#
-# class DeliveryPointsRetrieveAPIView(RetrieveAPIView):
-#     queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location', 'order_retention_period')
-#     serializer_class = DeliveryPointsRetrieveModelSerializer
-
 import uuid
 
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
-from django.db.models import Prefetch, Count, Q
+from django.db.models import Count, Q, Prefetch
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.generics import CreateAPIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.consumers.custom_pagination import ChatHistoryPagination
-from apps.models import City, DeliveryPoint, User, Message, ChatRoom
-from apps.models.users import Store
+from apps.models import City, DeliveryPoint, Category, User, Product, Shop
+from apps.models.chats import ChatRoom, Message
+from apps.serializer import CityListModelSerializer, DeliveryPointsListModelSerializer, \
+    DeliveryPointsRetrieveModelSerializer, CategorySerializer, RegisterSerializer, ProductListSerializer
 from apps.serializers import (
-    CityListModelSerializer,
-    DeliveryPointsListModelSerializer,
-    DeliveryPointsRetrieveModelSerializer, QRLoginStatusResponseSerializer, QRLoginRequestResponseSerializer,
-    QRLoginAuthorizeRequestSerializer, MessageSerializer, ChatRoomListSerializer,
-
-)
+    QRLoginStatusResponseSerializer, QRLoginRequestResponseSerializer,
+    QRLoginAuthorizeRequestSerializer, MessageSerializer, ChatRoomListSerializer, )
+from apps.tasks import register_sms, register_key
 from apps.utils import _generate_qr_image_base64
 
 signer = TimestampSigner()
 
 
 @extend_schema(tags=["User"])
+# Create your views here.
+@extend_schema(tags=['delivery point'])
 class CityListAPIView(ListAPIView):
     queryset = City.objects.all()
     serializer_class = CityListModelSerializer
     filter_backends = [SearchFilter]
-    search_fields = ["name"]
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+    search_fields = ['name']
 
 
-@extend_schema(tags=["User"])
+@extend_schema(tags=['delivery point'])
 class DeliveryPointsListAPIView(ListAPIView):
-    queryset = DeliveryPoint.objects.only("address", "has_dressing_room", "location")
+    queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location')
     serializer_class = DeliveryPointsListModelSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["city"]
 
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
-
-@extend_schema(tags=["User"])
+@extend_schema(tags=['delivery point'])
 class DeliveryPointsRetrieveAPIView(RetrieveAPIView):
-    queryset = DeliveryPoint.objects.only(
-        "address", "has_dressing_room", "location", "order_retention_period"
-    )
+    queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location', 'order_retention_period')
     serializer_class = DeliveryPointsRetrieveModelSerializer
 
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+
+@extend_schema(tags=['category'])
+class CategoryListAPIView(APIView):
+    def get(self, request):
+        tree = cache.get('categories_cache')
+        if tree is None:
+            top_categories = Category.objects.filter(parent=None).prefetch_related('subcategory')
+            tree = CategorySerializer(top_categories, many=True).data
+            cache.set('categories_cache', tree, 3)
+        return Response(tree)
+
+
+@extend_schema(tags=['Register'])
+class RegisterSmsCodeAPIView(APIView):
+    def get(self, request, phone):
+        if not request.user.is_authenticated:
+            if not cache.get(register_key(phone)):
+                register_sms.delay(phone)
+                return Response({'message': 'Tasdiqlash uchun kode yuborildi'})
+            else:
+                return Response({'message': 'Sizga kod yuborilgan'})
+        return Response({'message': "Royhatdan o'tgansiz"})
+
+
+@extend_schema(tags=['Register'])
+class RegisterAPIView(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+
+
+@extend_schema(tags=['Product'])
+class ProductListAPIView(ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductListSerializer
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        slug = self.kwargs.get('slug')
+        if "-" in slug:
+            category_id = int(slug.split('-')[-1])
+            return query.filter(category__path__contains=[category_id])
+        return query
 
 
 @extend_schema(tags=["Auth"])
@@ -209,8 +214,8 @@ class ChatRoomGetOrCreateView(GenericAPIView):
     def post(self, request, store_id):
         user = request.user
         try:
-            store = Store.objects.get(id=store_id)
-        except Store.DoesNotExist:
+            store = Shop.objects.get(id=store_id)
+        except Shop.DoesNotExist:
             return Response({"error": "Store topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
         room, created = ChatRoom.objects.get_or_create(buyer=user, store=store)
@@ -222,7 +227,7 @@ class ChatRoomGetOrCreateView(GenericAPIView):
 class ChatHistoryView(ListAPIView):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
-    pagination_class = ChatHistoryPagination
+    pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     queryset = Message.objects.all()
 

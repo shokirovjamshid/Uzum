@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ValidationError
 import base64
 import io
 
@@ -19,3 +20,8 @@ def _generate_qr_image_base64(payload: str) -> str:
 
 def _status_cache_key(user_id: int) -> str:
     return f"consumers:user_status:{user_id}"
+
+
+def code_length_validate(value):
+    if len(str(value)) != 6:
+        raise ValidationError('uzunligi 6 ga teng bolishi kerak')
