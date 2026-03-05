@@ -67,12 +67,6 @@ Task:
 2.Savol va javoblar ✅
 3.Ko'ptillik
 4.Hamma tovarlarni ko'rish ko'rish
-5.Selenium orqali uzumni katalogini ko'chiramiz
-
-
-
-
-
 5.Selenium orqali uzumni katalogini ko'chiramiz ✅
 6.Elasticsearch qo'shish alohida texnalogiya
 7.Argon database
@@ -82,7 +76,12 @@ Task:
 12.Faqat sellerda balance bor
 13.CategoryImage qo'shish kerak
 14.Ishlab chiqirlgan mamalakat ✅
-15.User modelni bo'lish ✅
+15.User modelni bo'lish
 16.Postgres ni bo'lish (pgpool) bilan high load uchun
 17.Meta base dashboard uchun caddy
+18.SEO(Search Engine Optimization)
+18.Categories,favorite,products ni ichiga birlashtirib yuborish kerak
+19.Favorite uchun API
+20.Shop uchun API
+21.Flask8 ,isort
 get_ttl

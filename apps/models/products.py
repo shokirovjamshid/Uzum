@@ -4,11 +4,11 @@ from django.db.models.fields import PositiveSmallIntegerField, PositiveBigIntege
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jsonform.models.fields import JSONField
 
-from apps.models.base import CreatedBaseModel, ImageBaseModel
+from apps.models.base import CreatedBaseModel, ImageBaseModel, SlugBaseModel
 from apps.models.utils import validate_video
 
 
-class Product(CreatedBaseModel):
+class Product(CreatedBaseModel,SlugBaseModel):
     name = CharField(max_length=90)
     category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
     guarantee = PositiveSmallIntegerField(null=True, blank=True, default=6)
@@ -54,5 +54,3 @@ class ProductVideo(Model):
     video = FileField(upload_to='product/videos/%Y/%m/%d', null=True, blank=True, validators=[validate_video])
     product_item = ForeignKey('apps.ProductItem', CASCADE, related_name='videos', blank=True, null=True)
     product = ForeignKey('apps.Product', CASCADE, related_name='videos', blank=True, null=True)
-
-

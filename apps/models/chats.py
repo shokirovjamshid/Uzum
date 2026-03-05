@@ -1,13 +1,12 @@
-from django.conf import settings
 from django.db.models import Model, ForeignKey, CASCADE, DateTimeField, TextField, URLField, PositiveIntegerField, \
     BooleanField, Index
 from django.utils import timezone
 
 
-class ChatRoom(Model):
-
-    buyer = ForeignKey("apps.User",CASCADE,related_name="customer_chats",limit_choices_to={'type': 'user'},db_index=True)
-    shop = ForeignKey('apps.Shop',CASCADE,related_name="shop_chats",db_index=True)
+class  ChatRoom(Model):
+    buyer = ForeignKey("apps.User", CASCADE, related_name="customer_chats", limit_choices_to={'type': 'user'},
+                       db_index=True)
+    shop = ForeignKey('apps.Shop', CASCADE, related_name="shop_chats", db_index=True)
 
     last_message_at = DateTimeField(default=timezone.now, db_index=True)
     created_at = DateTimeField(auto_now_add=True)

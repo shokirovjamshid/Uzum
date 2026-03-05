@@ -18,7 +18,6 @@ dependencies = [
     "django-ckeditor-5>=0.2.19",
     "django-elasticsearch-dsl-drf>=0.22.5",
     "django-filter>=25.2",
-    "django-jsonform>=2.23.2",
     "django-location-field>=2.7.3",
     "django-minio-storage>=0.5.9",
     "django-mptt>=0.18.0",

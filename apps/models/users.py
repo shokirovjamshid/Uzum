@@ -1,10 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db.models import CharField, IntegerChoices, ImageField, IntegerField, EmailField, TextChoices, OneToOneField
-from django.db.models import Model, ForeignKey, CASCADE
+from django.db.models import ForeignKey, CASCADE
 from django.db.models.fields import BooleanField, DateField
 from django.db.models.fields import FloatField, PositiveIntegerField, TextField
+
 from apps.managers import CustomUserManager, SellerCustomManager, ManagerCustomManager, AdminCustomManager
-from apps.models.base import CreatedBaseModel
+from apps.models.base import CreatedBaseModel, SlugBaseModel
 from apps.models.base import ImageBaseModel
 from apps.models.utils import uz_phone_validator
 
@@ -19,7 +20,7 @@ class User(AbstractUser, ImageBaseModel):
     class Gender(IntegerChoices):
         MALE = 1, 'Male'
         FEMALE = 0, 'Female'
-
+    addition_phone = CharField(max_length=12, validators=[uz_phone_validator])
     email = EmailField(unique=True, null=True, blank=True)
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
     password = CharField(max_length=128, null=True, blank=True)
@@ -44,7 +45,7 @@ class Seller(CreatedBaseModel):
     user = OneToOneField('apps.User', CASCADE, related_name='seller')
 
 
-class Shop(CreatedBaseModel, ImageBaseModel):
+class Shop(CreatedBaseModel, ImageBaseModel,SlugBaseModel):
     name = CharField(max_length=125)
     seller = ForeignKey('apps.Seller', CASCADE, related_name='shops')
     description = TextField(null=True, blank=True)

@@ -9,7 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -17,13 +17,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.models import City, DeliveryPoint, Category, User, Product, Shop
+from apps.models import City, DeliveryPoint, Category, User, Product, Shop, Favorite
 from apps.models.chats import ChatRoom, Message
-from apps.serializer import CityListModelSerializer, DeliveryPointsListModelSerializer, \
-    DeliveryPointsRetrieveModelSerializer, CategorySerializer, RegisterSerializer, ProductListSerializer
-from apps.serializers import (
-    QRLoginStatusResponseSerializer, QRLoginRequestResponseSerializer,
-    QRLoginAuthorizeRequestSerializer, MessageSerializer, ChatRoomListSerializer, )
+from apps.serializers import (QRLoginStatusResponseSerializer, QRLoginRequestResponseSerializer,
+                              QRLoginAuthorizeRequestSerializer, MessageSerializer, ChatRoomListSerializer,
+                              FavoriteProductModelSerializer, CityListModelSerializer,
+                              DeliveryPointsListModelSerializer, DeliveryPointsRetrieveModelSerializer,
+                              CategorySerializer, RegisterSerializer, ProductListSerializer, ShopProfileSerializer, )
 from apps.tasks import register_sms, register_key
 from apps.utils import _generate_qr_image_base64
 
@@ -56,12 +56,14 @@ class DeliveryPointsRetrieveAPIView(RetrieveAPIView):
 
 @extend_schema(tags=['category'])
 class CategoryListAPIView(APIView):
+    pagination_class = None
+
     def get(self, request):
         tree = cache.get('categories_cache')
         if tree is None:
             top_categories = Category.objects.filter(parent=None).prefetch_related('subcategory')
             tree = CategorySerializer(top_categories, many=True).data
-            cache.set('categories_cache', tree, 3)
+            cache.set('categories_cache', tree, 10)
         return Response(tree)
 
 
@@ -87,6 +89,7 @@ class RegisterAPIView(CreateAPIView):
 class ProductListAPIView(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
+    pagination_class = None
 
     def get_queryset(self):
         query = super().get_queryset()
@@ -100,6 +103,7 @@ class ProductListAPIView(ListAPIView):
 @extend_schema(tags=["Auth"])
 class QRCodeLoginRequestView(APIView):
     permission_classes = [AllowAny]
+    pagination_class = None
 
     def post(self, request, *args, **kwargs):
         raw_token = uuid.uuid4().hex
@@ -118,6 +122,7 @@ class QRCodeLoginRequestView(APIView):
 @extend_schema(tags=["Auth"])
 class QRCodeLoginAuthorizeView(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
     def post(self, request, *args, **kwargs):
         serializer = QRLoginAuthorizeRequestSerializer(data=request.data)
@@ -140,6 +145,7 @@ class QRCodeLoginAuthorizeView(APIView):
 
 @extend_schema(tags=["Auth"])
 class QRCodeLoginStatusView(APIView):
+    pagination_class = None
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
@@ -190,35 +196,25 @@ class ChatRoomListView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        qs = ChatRoom.objects.filter(Q(buyer=user) | Q(store__owner=user))
+        qs = ChatRoom.objects.filter(Q(buyer=user) | Q(shop__seller__user=user))
 
-        qs = qs.annotate(
-            unread_count=Count(
-                'messages',
-                filter=Q(messages__is_read=False) & ~Q(messages__sender=user)
-            )
-        )
+        qs = qs.annotate(unread_count=Count('messages', filter=Q(messages__is_read=False) & ~Q(messages__sender=user)))
 
-        return qs.prefetch_related(
-            Prefetch(
-                'messages',
-                queryset=Message.objects.order_by('-timestamp'),
-                to_attr='latest_message'
-            )
-        ).select_related('buyer', 'store')
+        return qs.prefetch_related(Prefetch('messages', queryset=Message.objects.order_by('-timestamp'),
+                                            to_attr='latest_message')).select_related('buyer', 'shop')
 
 
 @extend_schema(tags=["Chat"])
 class ChatRoomGetOrCreateView(GenericAPIView):
 
-    def post(self, request, store_id):
+    def post(self, request, shop_id):
         user = request.user
         try:
-            store = Shop.objects.get(id=store_id)
+            store = Shop.objects.get(id=shop_id)
         except Shop.DoesNotExist:
-            return Response({"error": "Store topilmadi"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Shop topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
-        room, created = ChatRoom.objects.get_or_create(buyer=user, store=store)
+        room, created = ChatRoom.objects.get_or_create(buyer=user, shop=store)
 
         return Response({"room_id": room.id, "is_new": created}, status=status.HTTP_200_OK)
 
@@ -243,3 +239,29 @@ class ChatHistoryView(ListAPIView):
             qs = qs.filter(id__lt=before_id)
 
         return qs.order_by("-timestamp")
+
+
+@extend_schema(tags=["product"])
+class FavoriteProductView(ListCreateAPIView, DestroyAPIView):
+    queryset = Favorite.objects.all()
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = FavoriteProductModelSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+
+    def get_object(self):
+        qs = super().get_object()
+        obj = get_object_or_404(qs, pk=self.kwargs["pk"])
+        return obj
+
+
+class ShopProfileAPIView(APIView):
+    queryset = Shop.objects.defer('updated_at',)
+    serializer_class = ShopProfileSerializer
+    pagination_class = None
+

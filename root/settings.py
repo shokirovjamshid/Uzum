@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'channels',
     'rest_framework',
     # online apps
-    'django_jsonform',
+    "django_jsonform",
     'drf_spectacular',
     'rest_framework_simplejwt',
     'django_celery_beat',
@@ -226,4 +226,5 @@ UNFOLD = {
         "show_all_applications": True,
     }
 }
+
 
