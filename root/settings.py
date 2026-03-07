@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import redis
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 from dotenv import load_dotenv
@@ -148,10 +149,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
 
 CELERY_BROKER_URL = REDIS_URL
-
+r = redis.Redis(host=f'{REDIS_HOST}', port=REDIS_PORT, db=1)
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",

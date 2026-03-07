@@ -7,6 +7,7 @@ from django.db.models.fields import FloatField, PositiveIntegerField, TextField
 from apps.managers import CustomUserManager, SellerCustomManager, AdminCustomManager
 from apps.models.base import CreatedBaseModel, SlugBaseModel
 from apps.models.base import ImageBaseModel
+from apps.models.base import SlugBaseModel
 from apps.models.utils import uz_phone_validator
 
 
@@ -53,5 +54,3 @@ class Shop(CreatedBaseModel, ImageBaseModel, SlugBaseModel):
     rating = FloatField(default=0, editable=False)
     comment_count = PositiveIntegerField(default=0, editable=False)
     order_count = PositiveIntegerField(default=0, editable=False)
-
-# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcyODE2MzcwLCJpYXQiOjE3NzI4MDE5NzAsImp0aSI6IjM1NzgyZWUzOTcxZDQxMWVhYTZmNzU4ZmEwNjQwYjgwIiwidXNlcl9pZCI6IjQifQ.OKLpPqyVg0wXURTYRS4WA97iMC-7ErBDdFl26l6dmFo

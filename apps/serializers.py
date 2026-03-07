@@ -157,19 +157,20 @@ class FavoriteProductModelSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model = Favorite
-        fields = 'id', 'user'
+        fields = 'id', 'user', 'product'
 
-    def to_representation(self, instance: Favorite):
+    def save(self, **kwargs):
+        product = kwargs.get('product')
+        user = kwargs.get('user')
+        obj, created = self.Meta.model.objects.get_or_create(product=product, user=user)
+        if not created:
+            obj.delete()
+            return Favorite(user=user, product=product)
+        return obj
+
+    def to_representation(self, instance):
         repr = super().to_representation(instance)
-        user = self.context['request'].user
-        repr.update(**ProductModelSerializer(instance.product, fields=('name', 'slug', 'price', 'rating')).data)
-        repr['shop_name'] = instance.product.shop.name
-        repr['is_favorite'] = Favorite.objects.filter(user=user, product=instance.product).exists()
-        card_item = CartItem.objects.filter(card__user=user, product=instance.product).only('quantity').first()
-        if card_item:
-            repr['quantity'] = card_item.quantity
-        else:
-            repr['quantity'] = 0
+        repr['is_favorite'] = Favorite.objects.filter(id=instance.id).exists()
         return repr
 
 
