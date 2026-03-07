@@ -4,7 +4,7 @@ from django.db.models import ForeignKey, CASCADE
 from django.db.models.fields import BooleanField, DateField
 from django.db.models.fields import FloatField, PositiveIntegerField, TextField
 
-from apps.managers import CustomUserManager, SellerCustomManager, ManagerCustomManager, AdminCustomManager
+from apps.managers import CustomUserManager, SellerCustomManager, AdminCustomManager
 from apps.models.base import CreatedBaseModel, SlugBaseModel
 from apps.models.base import ImageBaseModel
 from apps.models.utils import uz_phone_validator
@@ -20,7 +20,7 @@ class User(AbstractUser, ImageBaseModel):
     class Gender(IntegerChoices):
         MALE = 1, 'Male'
         FEMALE = 0, 'Female'
-    addition_phone = CharField(max_length=12, validators=[uz_phone_validator])
+
     email = EmailField(unique=True, null=True, blank=True)
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
     password = CharField(max_length=128, null=True, blank=True)
@@ -33,7 +33,6 @@ class User(AbstractUser, ImageBaseModel):
     USERNAME_FIELD = "phone"
     objects = CustomUserManager()
     sellers = SellerCustomManager()
-    managers = ManagerCustomManager()
     admins = AdminCustomManager()
 
     @property
@@ -43,13 +42,16 @@ class User(AbstractUser, ImageBaseModel):
 
 class Seller(CreatedBaseModel):
     user = OneToOneField('apps.User', CASCADE, related_name='seller')
+    password = CharField(max_length=128)
 
 
-class Shop(CreatedBaseModel, ImageBaseModel,SlugBaseModel):
+class Shop(CreatedBaseModel, ImageBaseModel, SlugBaseModel):
     name = CharField(max_length=125)
     seller = ForeignKey('apps.Seller', CASCADE, related_name='shops')
     description = TextField(null=True, blank=True)
     banner = ImageField(upload_to='seller/banner/%Y/%m/%d', null=True, blank=True)
-    rating = FloatField(default=0)
-    comment_count = PositiveIntegerField(default=0)
-    order_count = PositiveIntegerField(default=0)
+    rating = FloatField(default=0, editable=False)
+    comment_count = PositiveIntegerField(default=0, editable=False)
+    order_count = PositiveIntegerField(default=0, editable=False)
+
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzcyODE2MzcwLCJpYXQiOjE3NzI4MDE5NzAsImp0aSI6IjM1NzgyZWUzOTcxZDQxMWVhYTZmNzU4ZmEwNjQwYjgwIiwidXNlcl9pZCI6IjQifQ.OKLpPqyVg0wXURTYRS4WA97iMC-7ErBDdFl26l6dmFo

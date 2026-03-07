@@ -1,10 +1,21 @@
-from django.db.models import ForeignKey, CASCADE, SET_NULL, Model, BigIntegerField
+from django.db.models import BigIntegerField
+from django.db.models import Model, OneToOneField, CASCADE, ForeignKey, SET_NULL, SmallIntegerField
 from django.db.models.enums import TextChoices
 from django.db.models.fields import PositiveSmallIntegerField, CharField, BooleanField
 from location_field.forms.plain import PlainLocationField
 
 from apps.models.base import CreatedBaseModel
 from apps.models.utils import uz_phone_validator
+
+
+class Cart(Model):
+    user = OneToOneField('apps.User', CASCADE, related_name='cart')
+
+
+class CartItem(CreatedBaseModel):
+    product = ForeignKey('apps.Product', on_delete=SET_NULL, null=True)
+    quantity = SmallIntegerField(default=1)
+    cart = ForeignKey('apps.Cart', CASCADE, related_name='cart_items')
 
 
 class Order(CreatedBaseModel):
@@ -51,3 +62,12 @@ class CustomerRecipient(Model):
     surname = CharField(max_length=255)
     is_default = BooleanField()
     phone = CharField(max_length=50, validators=[uz_phone_validator])
+    user = ForeignKey('apps.User', CASCADE, related_name='customer_recipients')
+
+
+class Favorite(CreatedBaseModel):
+    product = ForeignKey('apps.Product', CASCADE, related_name='favorites')
+    user = ForeignKey('apps.User', CASCADE, related_name='favorites')
+
+    class Meta:
+        unique_together = ('product', 'user')

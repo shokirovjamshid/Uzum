@@ -7,9 +7,11 @@ from django.db.models import Count, Q, Prefetch
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
+from mptt.utils import get_cached_trees
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, DestroyAPIView, get_object_or_404
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, DestroyAPIView, get_object_or_404, \
+    RetrieveUpdateDestroyAPIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -17,21 +19,22 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.models import City, DeliveryPoint, Category, User, Product, Shop, Favorite
+from apps.models import City, DeliveryPoint, Category, User, Product, Shop, Favorite, Seller, Comment
 from apps.models.chats import ChatRoom, Message
+from apps.permissions import SellerBasePermission, SellerCreateBasePermission
 from apps.serializers import (QRLoginStatusResponseSerializer, QRLoginRequestResponseSerializer,
                               QRLoginAuthorizeRequestSerializer, MessageSerializer, ChatRoomListSerializer,
                               FavoriteProductModelSerializer, CityListModelSerializer,
                               DeliveryPointsListModelSerializer, DeliveryPointsRetrieveModelSerializer,
-                              CategorySerializer, RegisterSerializer, ProductListSerializer, ShopProfileSerializer, )
+                              RegisterSerializer, ProductListSerializer,
+                              CategoryModelSerializer, ShopRetrieveUpdateDestroySerializer, ShopListCreateSerializer,
+                              CommentListModelSerializer, CommentCreateModelSerializer, )
 from apps.tasks import register_sms, register_key
 from apps.utils import _generate_qr_image_base64
 
 signer = TimestampSigner()
 
 
-@extend_schema(tags=["User"])
-# Create your views here.
 @extend_schema(tags=['delivery point'])
 class CityListAPIView(ListAPIView):
     queryset = City.objects.all()
@@ -54,32 +57,36 @@ class DeliveryPointsRetrieveAPIView(RetrieveAPIView):
     serializer_class = DeliveryPointsRetrieveModelSerializer
 
 
-@extend_schema(tags=['category'])
-class CategoryListAPIView(APIView):
-    pagination_class = None
+@extend_schema(tags=['Product'])
+class CategoryListAPIView(ListAPIView):
+    queryset = Category.objects.defer('attribute', 'path', 'product_amount')
+    serializer_class = CategoryModelSerializer
 
-    def get(self, request):
-        tree = cache.get('categories_cache')
+    def list(self, request, *args, **kwargs):
+        tree = cache.get('categories_key')
         if tree is None:
-            top_categories = Category.objects.filter(parent=None).prefetch_related('subcategory')
-            tree = CategorySerializer(top_categories, many=True).data
-            cache.set('categories_cache', tree, 10)
-        return Response(tree)
+            queryset = self.filter_queryset(self.get_queryset()).prefetch_related('subcategory')
+            tree = get_cached_trees(queryset)
+            cache.set('categories_key', tree, 360)
+        serializer = self.get_serializer(tree, many=True)
+        return Response(serializer.data)
 
 
-@extend_schema(tags=['Register'])
+@extend_schema(tags=['Auth'])
 class RegisterSmsCodeAPIView(APIView):
     def get(self, request, phone):
-        if not request.user.is_authenticated:
-            if not cache.get(register_key(phone)):
-                register_sms.delay(phone)
-                return Response({'message': 'Tasdiqlash uchun kode yuborildi'})
-            else:
-                return Response({'message': 'Sizga kod yuborilgan'})
-        return Response({'message': "Royhatdan o'tgansiz"})
+
+        if request.user.is_authenticated:
+            return Response({'message': "Royhatdan o'tgansiz"})
+        key = register_key(phone)
+        if cache.get(key) is None:
+            register_sms.delay(phone)
+            return Response({'message': 'Tasdiqlash uchun kode yuborildi'})
+        else:
+            return Response({'message': 'Tasdiqlash uchun kode yuborildi'})
 
 
-@extend_schema(tags=['Register'])
+@extend_schema(tags=['Auth'])
 class RegisterAPIView(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -241,7 +248,7 @@ class ChatHistoryView(ListAPIView):
         return qs.order_by("-timestamp")
 
 
-@extend_schema(tags=["product"])
+@extend_schema(tags=["Product"])
 class FavoriteProductView(ListCreateAPIView, DestroyAPIView):
     queryset = Favorite.objects.all()
     permission_classes = [IsAuthenticated, ]
@@ -260,8 +267,41 @@ class FavoriteProductView(ListCreateAPIView, DestroyAPIView):
         return obj
 
 
-class ShopProfileAPIView(APIView):
-    queryset = Shop.objects.defer('updated_at',)
-    serializer_class = ShopProfileSerializer
-    pagination_class = None
+@extend_schema(tags=["shop"])
+class ShopRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Shop.objects.defer('updated_at')
+    serializer_class = ShopRetrieveUpdateDestroySerializer
+    permission_classes = SellerBasePermission,
+    lookup_field = 'slug'
 
+
+@extend_schema(tags=["shop"])
+class ShopListCreateAPIView(ListCreateAPIView):
+    queryset = Shop.objects.defer('updated_at')
+    serializer_class = ShopListCreateSerializer
+    permission_classes = IsAuthenticated, SellerCreateBasePermission
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        if self.request.user.type == User.TypeChoice.ADMIN:
+            return query
+        return query.filter(seller__user=self.request.user)
+
+    def perform_create(self, serializer):
+        seller = Seller.objects.get(user=self.request.user)
+        serializer.save(seller=seller)
+
+@extend_schema(tags=["Product"])
+class CommentListAPIView(ListAPIView):
+    queryset = Comment.objects.defer('is_anonymous','service_evaluation','delivery_speed_assessment','user','updated_at').prefetch_related('images')
+    serializer_class = CommentListModelSerializer
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        return query.filter(product__slug=self.kwargs.get('slug'),status=Comment.Status.PUBLISHED)
+
+
+@extend_schema(tags=["Product"])
+class CommentCreateAPIView(CreateAPIView):
+    queryset = Comment.objects.defer('status')
+    serializer_class = CommentCreateModelSerializer

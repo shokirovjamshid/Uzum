@@ -1,5 +1,5 @@
-from django.db.models import Model, CharField, ForeignKey, CASCADE, TimeField, BooleanField, TextField, \
-    SmallIntegerField
+from django.db.models import ForeignKey, CASCADE, TimeField, TextField, \
+    SmallIntegerField, Model, CharField, BooleanField
 from django.db.models.enums import TextChoices
 from location_field.models.plain import PlainLocationField
 
@@ -53,3 +53,13 @@ class WeekdaysInfo(Model):
     day_range = CharField(max_length=100)
     day_off = BooleanField(default=False)
     working_hours = CharField(max_length=255)
+
+
+class Country(Model):
+    name = CharField(max_length=50)
+
+
+class City(Model):
+    name = CharField(max_length=100)
+    is_default = BooleanField(default=False, null=True, blank=True)
+    location = PlainLocationField(based_fields=['city'], zoom=6)

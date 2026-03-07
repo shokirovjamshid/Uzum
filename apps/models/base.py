@@ -40,6 +40,9 @@ class ImageBaseModel(Model):
                                    upload_image_size_5mb_validator],
                        help_text="Hajmi 5 mb dan oshmasin va 3x4 bo'lishi kerak.Orqa fon oq bo'lishi kerak")
 
+    class Meta:
+        abstract = True
+
     def convert_img_to_webp(self):
         is_new_upload = isinstance(self.image.file, (InMemoryUploadedFile, TemporaryUploadedFile))
 

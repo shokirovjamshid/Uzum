@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.template.defaulttags import comment
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField, HiddenField, \
@@ -6,7 +7,8 @@ from rest_framework.fields import CharField, ChoiceField, SerializerMethodField,
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, CartItem
+from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, CartItem, Comment, \
+    CommentImage, Order, OrderItem
 from apps.models.chats import Message, ChatRoom
 from apps.models.utils import uz_phone_validator
 from apps.tasks import register_key
@@ -82,7 +84,7 @@ class ChatRoomSerializer(ModelSerializer):
 
     class Meta:
         model = ChatRoom
-        fields = ('id', 'buyer', 'store', 'last_message_at', 'last_message',)
+        fields = ('id', 'buyer', 'shop', 'last_message_at', 'last_message',)
 
     def get_last_message(self, obj):
         message = getattr(obj, "_last_message", None) or obj.messages.order_by('-timestamp').first()
@@ -171,15 +173,18 @@ class FavoriteProductModelSerializer(DynamicFieldsModelSerializer):
         return repr
 
 
-class CategorySerializer(ModelSerializer):
+class CategoryModelSerializer(ModelSerializer):
     children = SerializerMethodField()
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'children', 'slug']
+        fields = ['id', 'name', 'children', 'deeplink']
 
     def get_children(self, obj):
-        return CategorySerializer(obj.subcategory.all(), many=True).data
+        children = obj.get_children()
+        if children:
+            return CategoryModelSerializer(children, many=True).data
+        return []
 
 
 class RegisterSerializer(ModelSerializer):
@@ -219,7 +224,54 @@ class ProductListSerializer(ModelSerializer):
         re['image'] = instance.images.first()
         return re
 
-class ShopProfileSerializer(ModelSerializer):
+
+class ShopRetrieveUpdateDestroySerializer(ModelSerializer):
     class Meta:
         model = Shop
-        fields = 'name','banner','rating','description',"image",'order_count','created_at','comment_count'
+        fields = 'name', 'banner', 'rating', 'description', "image", 'order_count', 'created_at', 'comment_count'
+
+
+class ShopListCreateSerializer(ModelSerializer):
+    class Meta:
+        model = Shop
+        fields = 'name', 'image', 'rating', 'comment_count', 'description', 'banner'
+
+
+class CommentListModelSerializer(ModelSerializer):
+    class Meta:
+        model = Comment
+        exclude = 'is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'status', 'user', 'product'
+
+
+class CommentImageSerializer(ModelSerializer):
+    class Meta:
+        model = CommentImage
+        fields = ["id", "image"]
+
+
+class CommentCreateModelSerializer(ModelSerializer):
+    user = HiddenField(default=CurrentUserDefault())
+    images = CommentImageSerializer()
+
+    class Meta:
+        model = Comment
+        fields = 'user', 'product', 'user_name', 'quality_assessment', 'service_evaluation', 'delivery_speed_assessment', 'advantages', 'disadvantages', 'comment', 'is_anonymous', 'images'
+
+    def validate(self, attrs):
+        user = attrs.get('user')
+        product = attrs.get('product')
+        if not OrderItem.objects.filter(product=product,order__user=user).exists():
+            raise ValidationError('Siz kommit yoza olmaysiz')
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        images = validated_data.pop('images')
+        is_anonymous = validated_data.get('is_anonymous')
+        user = validated_data.get('user')
+        if is_anonymous:
+            comments = self.Meta.model.objects.create(**validated_data,user_name='Anonim')
+        else:
+            comments = self.Meta.model.objects.create(**validated_data,user_name=user.first_name)
+        [CommentImage.objects.create(comment=comments,image=image) for image in images]
+        return comments
+

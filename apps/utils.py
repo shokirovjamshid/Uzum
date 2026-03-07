@@ -1,8 +1,10 @@
+from django.core.cache import cache
 from rest_framework.exceptions import ValidationError
 import base64
 import io
 
 from qrcode import QRCode
+
 
 def _generate_qr_image_base64(payload: str) -> str:
     qr = QRCode(version=1, box_size=10, border=5)
@@ -25,3 +27,5 @@ def _status_cache_key(user_id: int) -> str:
 def code_length_validate(value):
     if len(str(value)) != 6:
         raise ValidationError('uzunligi 6 ga teng bolishi kerak')
+
+
