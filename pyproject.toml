@@ -38,6 +38,7 @@ dependencies = [
     "utils",
     "celery-types>=0.24.0",
     "django-jsonform>=2.23.2",
+    "django-redis>=6.0.0",
 ]
 
 [dependency-groups]

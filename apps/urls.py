@@ -2,7 +2,8 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.views import CategoryListAPIView, \
-    RegisterSmsCodeAPIView, RegisterAPIView, ProductListAPIView, FavoriteProductView, ShopProfileAPIView
+    RegisterSmsCodeAPIView, RegisterAPIView, ProductListAPIView,  \
+     FavoriteListCreateAPIView
 from apps.views import (CityListAPIView, DeliveryPointsListAPIView, DeliveryPointsRetrieveAPIView, ChatHistoryView,
                         ImageUploadView, ChatRoomListView, ChatRoomGetOrCreateView, )
 from apps.views import (QRCodeLoginRequestView, QRCodeLoginAuthorizeView, QRCodeLoginStatusView, )
@@ -29,8 +30,8 @@ urlpatterns = [
     path("rooms//history/<int:room_id>", ChatHistoryView.as_view(), name="chat_history"),
     path("upload-image/", ImageUploadView.as_view(), name="chat_image_upload"),
 
-    #Products
-    path("user/favorites/", FavoriteProductView.as_view(), name="product_list"),
-    path('user/favorite/<int:pk>', FavoriteProductView.as_view(), name='product_detail'),
-    path('shop/{slug:slug}', ShopProfileAPIView.as_view(), name='shop_profile'),
+    # Products
+    # path("user/favorites/", FavoriteProductView.as_view(), name="product_list"),
+    path('user/favorite/<int:pk>', FavoriteListCreateAPIView.as_view(), name='product_favorite'),
+    # path('shop/{slug:slug}', ShopProfileAPIView.as_view(), name='shop_profile'),
 ]

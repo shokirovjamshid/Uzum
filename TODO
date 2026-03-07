@@ -82,6 +82,7 @@ Task:
 18.SEO(Search Engine Optimization)
 18.Categories,favorite,products ni ichiga birlashtirib yuborish kerak
 19.Favorite uchun API
-20.Shop uchun API
+20.Shop uchun API har bir user uchun ya'ni admin uchun hamma shoplarni ko'rish,seller uchun o'zinikini,user uchun faqat bitta
 21.Flask8 ,isort
-get_ttl
+22.docker ignoreni to'g'irlash
+23.get_ttl ya'ni sms ko'dni qolgan vaqtini ko'rish
