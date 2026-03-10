@@ -1,0 +1,53 @@
+1. Loyihani ishga tushirish va to'xtatish
+
+    docker compose up — Barcha konteynerlarni ishga tushiradi va loglarni terminalda ko'rsatadi.
+
+    docker compose up -d — Konteynerlarni orqa fonda (detached mode) ishga tushiradi.
+
+    docker compose stop — Konteynerlarni vaqtincha to'xtatadi (lekin o'chirmaydi).
+
+    docker compose start — To'xtatilgan konteynerlarni qayta yoqadi.
+
+    docker compose restart — Konteynerlarni o'chirib, qaytadan yoqadi.
+
+    docker compose down — Konteynerlarni to'xtatadi va ularni tarmoqlari (networks) bilan birga o'chirib tashlaydi.
+
+    docker compose down -v — Konteynerlarni o'chiradi va bazadagi barcha ma'lumotlarni (volumes) ham tozalaydi.
+
+2. Qurish va Yangilash (Build)
+
+    docker compose build — Imidjlarni (images) Dockerfile asosida quradi.
+
+    docker compose up --build — Imidjlarni qayta quradi va konteynerlarni ishga tushiradi (kod o'zgarganda tavsiya etiladi).
+
+    docker compose build --no-cache — Oldingi keshdan foydalanmasdan imidjlarni noldan quradi.
+
+3. Konteyner ichida buyruq bajarish (Django/uv)
+
+    docker compose exec <service_name> <command> — Ishlab turgan konteyner ichida buyruq bajarish.
+
+    docker compose exec web uv run python manage.py migrate — Ma'lumotlar bazasini migratsiya qilish.
+
+    docker compose exec web uv run python manage.py makemigrations — Yangi migratsiya fayllarini yaratish.
+
+    docker compose exec web uv run python manage.py createsuperuser — Admin foydalanuvchi yaratish.
+
+    docker compose exec web uv add <package> — Yangi Python kutubxonasini qo'shish.
+
+4. Monitoring va Loglar (Xatolarni ko'rish)
+
+    docker compose logs — Barcha konteynerlar loglarini ko'rish.
+
+    docker compose logs -f — Loglarni real vaqt rejimida kuzatib borish.
+
+    docker compose logs -f worker — Celery worker xatolarini va video segmentatsiya jarayonini kuzatish.
+
+    docker compose ps — Qaysi konteynerlar ishlab turganini tekshirish.
+
+    docker compose stats — Konteynerlar qancha RAM va CPU ishlatayotganini ko'rish.
+
+5. Tozalash (Cleanup)
+
+    docker compose rm — To'xtatilgan konteynerlarni o'chirib tashlaydi.
+
+    docker system prune — Ishlatilmayotgan barcha docker resurslarini (images, networks) tozalaydi.

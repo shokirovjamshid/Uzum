@@ -39,7 +39,7 @@ class Category(MPTTModel, ImageBaseModel):
 
 
 class Product(CreatedBaseModel, SlugBaseModel):
-    name = CharField(max_length=90)
+    name = CharField(max_length=90,db_index=True)
     category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
     guarantee = PositiveSmallIntegerField(null=True, blank=True, default=6)
     shop = ForeignKey('apps.Shop', CASCADE, related_name='products')

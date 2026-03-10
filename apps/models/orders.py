@@ -13,7 +13,7 @@ class Cart(Model):
 
 
 class CartItem(CreatedBaseModel):
-    product = ForeignKey('apps.Product', on_delete=SET_NULL, null=True)
+    product = ForeignKey('apps.Product', SET_NULL, null=True)
     quantity = SmallIntegerField(default=1)
     cart = ForeignKey('apps.Cart', CASCADE, related_name='cart_items')
 
@@ -34,7 +34,6 @@ class Order(CreatedBaseModel):
     customer_recipient = ForeignKey('apps.CustomerRecipient', SET_NULL, null=True)
     delivery_location = PlainLocationField(based_fields=['address'], zoom=9)
     status = CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
-    # promo_code =
 
 
 class OrderItem(Model):
@@ -58,7 +57,7 @@ class PaymentType(Model):
 
 
 class CustomerRecipient(Model):
-    name = CharField(max_length=255)
+    name = CharField(max_length=255,db_index=True)
     surname = CharField(max_length=255)
     is_default = BooleanField()
     phone = CharField(max_length=50, validators=[uz_phone_validator])

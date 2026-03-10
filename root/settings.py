@@ -5,14 +5,22 @@ from pathlib import Path
 import redis
 from django.templatetags.static import static
 from django.urls import reverse_lazy
-from dotenv import load_dotenv
 
-load_dotenv('.env')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+
+def is_docker():
+    return Path("/.dockerenv").exists()
+
+
+if not is_docker():
+    from dotenv import load_dotenv
+
+    load_dotenv('.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -205,8 +213,8 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
-ES_INDEX = os.getenv("ELASTICSEARCH_PRODUCT_INDEX", "products")
+# ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
+# ES_INDEX = os.getenv("ELASTICSEARCH_PRODUCT_INDEX", "products")
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
@@ -214,7 +222,7 @@ AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = True
 AWS_S3_FILE_OVERWRITE = False
-
+DJANGO_CELERY_BEAT_TZ_AWARE = False
 AUTH_USER_MODEL = 'apps.User'
 
 UNFOLD = {

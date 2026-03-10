@@ -291,14 +291,16 @@ class ShopListCreateAPIView(ListCreateAPIView):
         seller = Seller.objects.get(user=self.request.user)
         serializer.save(seller=seller)
 
+
 @extend_schema(tags=["Product"])
 class CommentListAPIView(ListAPIView):
-    queryset = Comment.objects.defer('is_anonymous','service_evaluation','delivery_speed_assessment','user','updated_at').prefetch_related('images')
+    queryset = Comment.objects.defer('is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'user',
+                                     'updated_at').prefetch_related('images')
     serializer_class = CommentListModelSerializer
 
     def get_queryset(self):
         query = super().get_queryset()
-        return query.filter(product__slug=self.kwargs.get('slug'),status=Comment.Status.PUBLISHED)
+        return query.filter(product__slug=self.kwargs.get('slug'), status=Comment.Status.PUBLISHED)
 
 
 @extend_schema(tags=["Product"])
