@@ -1,5 +1,4 @@
 from django.core.cache import cache
-from django.template.defaulttags import comment
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField, HiddenField, \
@@ -7,8 +6,8 @@ from rest_framework.fields import CharField, ChoiceField, SerializerMethodField,
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, CartItem, Comment, \
-    CommentImage, Order, OrderItem
+from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, Comment, \
+    CommentImage, OrderItem
 from apps.models.chats import Message, ChatRoom
 from apps.models.utils import uz_phone_validator
 from apps.tasks import register_key
@@ -168,11 +167,6 @@ class FavoriteProductModelSerializer(DynamicFieldsModelSerializer):
             return Favorite(user=user, product=product)
         return obj
 
-    def to_representation(self, instance):
-        repr = super().to_representation(instance)
-        repr['is_favorite'] = Favorite.objects.filter(id=instance.id).exists()
-        return repr
-
 
 class CategoryModelSerializer(ModelSerializer):
     children = SerializerMethodField()
@@ -261,7 +255,7 @@ class CommentCreateModelSerializer(ModelSerializer):
     def validate(self, attrs):
         user = attrs.get('user')
         product = attrs.get('product')
-        if not OrderItem.objects.filter(product=product,order__user=user).exists():
+        if not OrderItem.objects.filter(product=product, order__user=user).exists():
             raise ValidationError('Siz kommit yoza olmaysiz')
         return super().validate(attrs)
 
@@ -270,9 +264,8 @@ class CommentCreateModelSerializer(ModelSerializer):
         is_anonymous = validated_data.get('is_anonymous')
         user = validated_data.get('user')
         if is_anonymous:
-            comments = self.Meta.model.objects.create(**validated_data,user_name='Anonim')
+            comments = self.Meta.model.objects.create(**validated_data, user_name='Anonim')
         else:
-            comments = self.Meta.model.objects.create(**validated_data,user_name=user.first_name)
-        [CommentImage.objects.create(comment=comments,image=image) for image in images]
+            comments = self.Meta.model.objects.create(**validated_data, user_name=user.first_name)
+        [CommentImage.objects.create(comment=comments, image=image) for image in images]
         return comments
-

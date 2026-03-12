@@ -22,6 +22,7 @@ class Category(MPTTModel, ImageBaseModel):
     attribute = JSONField(null=True, blank=True)
     path = ArrayField(PositiveIntegerField(), default=list, editable=False)
 
+
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.name)

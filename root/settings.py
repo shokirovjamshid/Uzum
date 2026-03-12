@@ -82,7 +82,7 @@ ROOT_URLCONF = 'root.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -96,7 +96,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'root.wsgi.application'
 ASGI_APPLICATION = 'root.asgi.application'
-
+AUTH_USER_MODEL = 'apps.User'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -152,7 +152,7 @@ REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
 
 CELERY_BROKER_URL = REDIS_URL
-r = redis.Redis(host=f'{REDIS_HOST}', port=REDIS_PORT, db=1)
+redis_cache = redis.Redis.from_url(REDIS_URL)
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -214,8 +214,6 @@ AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = True
 AWS_S3_FILE_OVERWRITE = False
-
-AUTH_USER_MODEL = 'apps.User'
 
 UNFOLD = {
     "SITE_TITLE": "Uzum Admin Dashboard",

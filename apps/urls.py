@@ -31,10 +31,11 @@ urlpatterns = [
     path("upload-image/", ImageUploadView.as_view(), name="chat_image_upload"),
 
     # Products
-    path("user/favorites/", FavoriteProductView.as_view(), name="product_list"),
+    path('products', ProductListAPIView.as_view(), name='product_list'),
+    path("user/favorites", FavoriteProductView.as_view(), name="product_list"),
     path('user/favorite/<int:pk>', FavoriteProductView.as_view(), name='product_detail'),
     path('shops/<slug:slug>', ShopRetrieveUpdateDestroyAPIView.as_view(), name='shop_profile'),
     path('shops', ShopListCreateAPIView.as_view(), name='shop_list_and_create_apies'),
-    path('products/<slug:slug>/comments',CommentListAPIView.as_view(),name='comments_list'),
-    path('comments/create',CommentCreateAPIView.as_view(),name='comment_create'),
+    path('products/comments', CommentListAPIView.as_view(), name='comments_list'),
+    path('comments/create', CommentCreateAPIView.as_view(), name='comment_create'),
 ]

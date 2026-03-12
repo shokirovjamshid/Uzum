@@ -10,8 +10,7 @@ from drf_spectacular.utils import extend_schema
 from mptt.utils import get_cached_trees
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, DestroyAPIView, get_object_or_404, \
-    RetrieveUpdateDestroyAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, DestroyAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -19,6 +18,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.filters import CommentFilterModel, ProductFiterSet
 from apps.models import City, DeliveryPoint, Category, User, Product, Shop, Favorite, Seller, Comment
 from apps.models.chats import ChatRoom, Message
 from apps.permissions import SellerBasePermission, SellerCreateBasePermission
@@ -96,15 +96,8 @@ class RegisterAPIView(CreateAPIView):
 class ProductListAPIView(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
-    pagination_class = None
-
-    def get_queryset(self):
-        query = super().get_queryset()
-        slug = self.kwargs.get('slug')
-        if "-" in slug:
-            category_id = int(slug.split('-')[-1])
-            return query.filter(category__path__contains=[category_id])
-        return query
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFiterSet
 
 
 @extend_schema(tags=["Auth"])
@@ -258,14 +251,6 @@ class FavoriteProductView(ListCreateAPIView, DestroyAPIView):
         qs = super().get_queryset()
         return qs.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        super().perform_create(serializer)
-
-    def get_object(self):
-        qs = super().get_object()
-        obj = get_object_or_404(qs, pk=self.kwargs["pk"])
-        return obj
-
 
 @extend_schema(tags=["shop"])
 class ShopRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
@@ -283,22 +268,23 @@ class ShopListCreateAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         query = super().get_queryset()
-        if self.request.user.type == User.TypeChoice.ADMIN:
+        user = self.request.user
+        if user.is_admin:
             return query
-        return query.filter(seller__user=self.request.user)
+        return query.filter(seller__user=user)
 
     def perform_create(self, serializer):
         seller = Seller.objects.get(user=self.request.user)
         serializer.save(seller=seller)
 
+
 @extend_schema(tags=["Product"])
 class CommentListAPIView(ListAPIView):
-    queryset = Comment.objects.defer('is_anonymous','service_evaluation','delivery_speed_assessment','user','updated_at').prefetch_related('images')
+    queryset = Comment.objects.defer('is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'user',
+                                     'updated_at').prefetch_related('images')
     serializer_class = CommentListModelSerializer
-
-    def get_queryset(self):
-        query = super().get_queryset()
-        return query.filter(product__slug=self.kwargs.get('slug'),status=Comment.Status.PUBLISHED)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CommentFilterModel
 
 
 @extend_schema(tags=["Product"])
