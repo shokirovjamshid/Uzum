@@ -40,7 +40,7 @@ class Category(MPTTModel, ImageBaseModel):
 
 
 class Product(CreatedBaseModel, SlugBaseModel):
-    name = CharField(max_length=90)
+    name = CharField(max_length=90, db_index=True)
     category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
     guarantee = PositiveSmallIntegerField(null=True, blank=True, default=6)
     shop = ForeignKey('apps.Shop', CASCADE, related_name='products')
@@ -99,6 +99,7 @@ class Comment(CreatedBaseModel):
     class Status(IntegerChoices):
         REJECTED = 0, 'Rejected'
         PUBLISHED = 1, 'Published'
+
     user_name = CharField(max_length=100)
     product = ForeignKey('apps.Product', CASCADE, related_name='comments')
     quality_assessment = PositiveSmallIntegerField(validators=[quality_assessment_validate])
@@ -108,7 +109,7 @@ class Comment(CreatedBaseModel):
     advantages = TextField()
     disadvantages = TextField()
     comment = TextField()
-    status = PositiveSmallIntegerField(choices=Status.choices,null=True,blank=True)
+    status = PositiveSmallIntegerField(choices=Status.choices, null=True, blank=True)
     is_anonymous = BooleanField(default=False)
 
 

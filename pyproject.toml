@@ -29,7 +29,6 @@ dependencies = [
     "image>=1.5.33",
     "moviepy==1.0.3",
     "psycopg2-binary>=2.9.11",
-    "python-dotenv>=1.2.1",
     "redis>=7.2.0",
     "ujson>=5.11.0",
     "django-elasticsearch-dsl>=9.0",
@@ -39,11 +38,14 @@ dependencies = [
     "celery-types>=0.24.0",
     "django-jsonform>=2.23.2",
     "django-redis>=6.0.0",
+    "gunicorn>=25.1.0",
+    "flower>=2.0.1",
 ]
 
 [dependency-groups]
 dev = [
     "blinker>=1.9.0",
+    "python-dotenv>=1.2.1",
     "selenium>=4.41.0",
     "selenium-wire>=5.1.0",
     "webdriver-manager>=4.0.2",

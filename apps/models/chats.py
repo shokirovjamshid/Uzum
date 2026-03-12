@@ -3,7 +3,7 @@ from django.db.models import Model, ForeignKey, CASCADE, DateTimeField, TextFiel
 from django.utils import timezone
 
 
-class  ChatRoom(Model):
+class ChatRoom(Model):
     buyer = ForeignKey("apps.User", CASCADE, related_name="customer_chats", limit_choices_to={'type': 'user'},
                        db_index=True)
     shop = ForeignKey('apps.Shop', CASCADE, related_name="shop_chats", db_index=True)

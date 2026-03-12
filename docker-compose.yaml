@@ -1,0 +1,131 @@
+services:
+
+  backend_service:
+    build: .
+    command: >
+      uv run gunicorn root.wsgi:application --bind 0.0.0.0:8000
+    #    ports:
+    #      - "8000:8000"
+    env_file:
+      - .env.prod
+    volumes:
+      - backend_static:/app/static
+      - backend_media:/app/media
+    depends_on:
+      - redis_service
+      - postgres_service
+    restart: on-failure
+
+  backend_ws_service:
+    build: .
+    environment:
+      - PYTHONPATH=/app
+    command: >
+      uv run daphne -b 0.0.0.0 -p 8001 root.asgi:application
+    env_file:
+      - .env.prod
+    volumes:
+      - backend_static:/app/static
+      - backend_media:/app/media
+    depends_on:
+      - postgres_service
+      - redis_service
+  #    ports:
+  #      - "8001:8001"
+
+  celery_service:
+    build: .
+    command: >
+      uv run celery -A root worker -l INFO
+    env_file:
+      - .env.prod
+    volumes:
+      - backend_static:/app/static
+      - backend_media:/app/media
+    depends_on:
+      - redis_service
+      - postgres_service
+
+  celery_beat_service:
+    build: .
+    command: >
+      uv run celery -A root beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    env_file:
+      - .env.prod
+    volumes:
+      - backend_static:/app/static
+      - backend_media:/app/media
+    depends_on:
+      - redis_service
+      - postgres_service
+      - celery_service
+
+  celery_flower_service:
+    build: .
+    command: >
+      uv run celery -A root.celery flower --port=5001
+    env_file:
+      - .env.prod
+    ports:
+      - "5001:5001"
+    volumes:
+      - backend_static:/app/static
+      - backend_media:/app/media
+    depends_on:
+      - redis_service
+      - postgres_service
+      - celery_service
+
+  redis_service:
+    image: redis:alpine
+    env_file:
+      - .env.prod
+
+  postgres_service:
+    image: postgres:alpine
+    env_file:
+      - .env.prod
+    volumes:
+      - pg_data:/var/lib/postgresql
+
+
+
+  nginx_service:
+    image: nginx:alpine
+    ports:
+      - "8005:80"
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - backend_static:/app/static
+      - backend_media:/app/media
+    depends_on:
+      - backend_service
+      - backend_ws_service
+      - redis_service
+      - postgres_service
+      - celery_service
+    restart: always
+#  minio_service:
+#    image: minio/minio
+#    ports:
+#      - '9000:9000'
+#      - '9001:9001'
+#    env_file: env/.env
+#    command: uv run server /data --console-address :9001
+#    volumes:
+#      - minio_data:/data
+#
+#  elasticsearch_service:
+#    image: elasticsearch:alpine
+#    ports:
+#      - '9300:9300'
+#      - '9200:9200'
+#    environment:
+#      - discovery.type=single-node
+#    volumes:
+#      - es_data:/usr/share/elasticsearch/data
+volumes:
+  pg_data:
+  backend_static:
+  backend_media:
