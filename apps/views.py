@@ -9,16 +9,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from mptt.utils import get_cached_trees
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, DestroyAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.filters import CommentFilterModel, ProductFiterSet
+from apps.filters import ProductFiterSet
 from apps.models import City, DeliveryPoint, Category, User, Product, Shop, Favorite, Seller, Comment
 from apps.models.chats import ChatRoom, Message
 from apps.permissions import SellerBasePermission, SellerCreateBasePermission
@@ -28,7 +30,8 @@ from apps.serializers import (QRLoginStatusResponseSerializer, QRLoginRequestRes
                               DeliveryPointsListModelSerializer, DeliveryPointsRetrieveModelSerializer,
                               RegisterSerializer, ProductListSerializer,
                               CategoryModelSerializer, ShopRetrieveUpdateDestroySerializer, ShopListCreateSerializer,
-                              CommentListModelSerializer, CommentCreateModelSerializer, )
+                              CommentListModelSerializer, CommentCreateModelSerializer,
+                              )
 from apps.tasks import register_sms, register_key
 from apps.utils import _generate_qr_image_base64
 
@@ -92,12 +95,12 @@ class RegisterAPIView(CreateAPIView):
     serializer_class = RegisterSerializer
 
 
-@extend_schema(tags=['Product'])
-class ProductListAPIView(ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductListSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = ProductFiterSet
+# @extend_schema(tags=['Product'])
+# class ProductListAPIView(ListAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductListSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_class = ProductFiterSet
 
 
 @extend_schema(tags=["Auth"])
@@ -278,16 +281,53 @@ class ShopListCreateAPIView(ListCreateAPIView):
         serializer.save(seller=seller)
 
 
-@extend_schema(tags=["Product"])
-class CommentListAPIView(ListAPIView):
-    queryset = Comment.objects.defer('is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'user',
-                                     'updated_at').prefetch_related('images')
-    serializer_class = CommentListModelSerializer
+# @extend_schema(tags=["Product"])
+# class CommentListAPIView(ListAPIView):
+#     queryset = Comment.objects.defer('is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'user',
+#                                      'updated_at').prefetch_related('images').filter(status=Comment.Status.PUBLISHED)
+#     serializer_class = CommentListModelSerializer
+#     filter_backends = [DjangoFilterBackend, OrderingFilter]
+#     filterset_class = CommentFilterModel
+#     ordering_fields = 'quality_assessment', 'created_at'
+#     pagination_class = CommentPagination
+#
+#     def get_queryset(self):
+#         query = super().get_queryset()
+#         return query.filter(product__slug=self.kwargs.get('slug'))
+
+
+# @extend_schema(tags=["Product"])
+# class CommentCreateAPIView(CreateAPIView):
+#     queryset = Comment.objects.defer('status')
+#     serializer_class = CommentCreateModelSerializer
+
+
+class ProductModelViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductListSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_class = CommentFilterModel
+    filterset_class = ProductFiterSet
+    lookup_url_kwarg = 'slug'
 
+    # http_method_names = 'get',
 
-@extend_schema(tags=["Product"])
-class CommentCreateAPIView(CreateAPIView):
-    queryset = Comment.objects.defer('status')
-    serializer_class = CommentCreateModelSerializer
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return ProductListSerializer
+        return super().get_serializer_class()
+
+    @action(detail=True, url_path='comments', methods=['get'])
+    def get_comment(self, request, **kwargs):
+        product = self.get_object()
+        comments = Comment.objects.filter(product=product)
+        serializer = CommentListModelSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, url_path='comments', methods=['post'])
+    def create_comment(self, request, **kwargs):
+        product = self.get_object()
+        serializer = CommentCreateModelSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(product=product, user=request.user)
+            return Response(serializer.data)
+        return Response(serializer.errors)

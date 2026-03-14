@@ -1,14 +1,12 @@
-from django_filters import CharFilter
+from django_filters import CharFilter, BooleanFilter
 from django_filters.rest_framework import FilterSet
-
-from apps.models import Comment
 
 
 class CommentFilterModel(FilterSet):
-    product_slug = CharFilter(method='product_slug_filter')
+    is_image = BooleanFilter(method='is_image_filter')
 
-    def product_slug_filter(self, queryset, field_name, value):
-        return queryset.filter(product__slug=value, status=Comment.Status.PUBLISHED)
+    def is_image_filter(self, queryset, field_name, value):
+        return queryset.filter(images__isnull=value)
 
 
 class ProductFiterSet(FilterSet):

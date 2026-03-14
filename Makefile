@@ -10,3 +10,5 @@ celery-beat:
 
 flower:
 	celery -A root.celery flower --port=5001
+superuser:
+	python3 manage.py createsuperuser

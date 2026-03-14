@@ -263,9 +263,10 @@ class CommentCreateModelSerializer(ModelSerializer):
         images = validated_data.pop('images')
         is_anonymous = validated_data.get('is_anonymous')
         user = validated_data.get('user')
-        if is_anonymous:
-            comments = self.Meta.model.objects.create(**validated_data, user_name='Anonim')
-        else:
-            comments = self.Meta.model.objects.create(**validated_data, user_name=user.first_name)
-        [CommentImage.objects.create(comment=comments, image=image) for image in images]
+        user_name = 'Anonim'
+        if not is_anonymous:
+            user_name = user.first_name
+        comments = self.Meta.model.objects.create(**validated_data, user_name=user_name)
+        comments_list = [CommentImage(comment=comments, image=image) for image in images]
+        CommentImage.objects.bulk_create(comments_list)
         return comments
