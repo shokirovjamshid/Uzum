@@ -15,8 +15,8 @@ class CustomUserAdmin(ModelAdmin):
     search_fields = ("first_name", "last_name", "phone")
     ordering = ("phone",)
     fieldsets = (
-        (None, {"fields": ("phone","email")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name","type")}),
+        (None, {"fields": ("phone", "email")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "type")}),
         (
             _("Permissions"),
             {
@@ -33,7 +33,6 @@ class CustomUserAdmin(ModelAdmin):
     )
 
 
-
 @admin.register(City)
 class CityAdmin(ModelAdmin):
     pass
@@ -47,10 +46,23 @@ class DaysWeekAdmin(ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
     search_fields = 'name',
+    autocomplete_fields = 'name'
+
 
 @admin.register(Shop)
 class ShopAdmin(ModelAdmin):
     search_fields = 'name',
+    autocomplete_fields = 'name'
+
+    # def has_delete_permission(self, request, obj=...):
+    #     return super().has_delete_permission(request, obj)
+    #
+    # def has_change_permission(self, request, obj=...):
+    #     return super().has_change_permission(request, obj)
+    #
+    # def has_add_permission(self, request):
+    #     return super().has_add_permission(request)
+
 
 @admin.register(Seller)
 class SellerAdmin(ModelAdmin):

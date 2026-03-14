@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.template.defaulttags import comment
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField, HiddenField, \
@@ -7,7 +8,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, Comment, \
-    CommentImage, OrderItem
+    CommentImage, OrderItem, CartItem
 from apps.models.chats import Message, ChatRoom
 from apps.models.utils import uz_phone_validator
 from apps.tasks import register_key
@@ -151,7 +152,7 @@ class ShopModelSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class FavoriteProductModelSerializer(DynamicFieldsModelSerializer):
+class FavoriteListProductModelSerializer(DynamicFieldsModelSerializer):
     user = HiddenField(default=CurrentUserDefault())
 
     class Meta:
@@ -166,6 +167,24 @@ class FavoriteProductModelSerializer(DynamicFieldsModelSerializer):
             obj.delete()
             return Favorite(user=user, product=product)
         return obj
+
+
+class FavoriteRetrieveProductSerializer(DynamicFieldsModelSerializer):
+    user = HiddenField(default=CurrentUserDefault())
+
+    class Meta:
+        model = Favorite
+        fields = 'id', 'user', 'product'
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        user = self.context['request'].user
+        cart_item = CartItem.objects.filter(card__user=user, product=instance.product).only('quantity').first()
+        if cart_item:
+            repr['quantity'] = cart_item.quantity
+        else:
+            repr['quantity'] = 0
+        return repr
 
 
 class CategoryModelSerializer(ModelSerializer):
@@ -270,3 +289,4 @@ class CommentCreateModelSerializer(ModelSerializer):
         comments_list = [CommentImage(comment=comments, image=image) for image in images]
         CommentImage.objects.bulk_create(comments_list)
         return comments
+

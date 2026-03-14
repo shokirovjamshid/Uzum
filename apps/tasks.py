@@ -18,7 +18,7 @@ def register_sms(phone):
     code = randint(100000, 999999)
     key = register_key(phone)
     if not cache.get(key):
-        cache.set(key, code, 120)
+        cache.set(key, code, 300)
 
     text = f"Tasdiqlash kodi: {code}"
     send_sms_code.delay(phone, text)

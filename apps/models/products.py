@@ -1,7 +1,7 @@
-from django.db.models import CASCADE, JSONField, TextField, BooleanField, IntegerChoices, ImageField
-from django.db.models import ForeignKey, SET_NULL, Model, BigIntegerField, FileField, UniqueConstraint
-from django.db.models.fields import CharField, SlugField, URLField, PositiveIntegerField
-from django.db.models.fields import PositiveSmallIntegerField, PositiveBigIntegerField, FloatField
+from django.db.models import CASCADE, TextField, BooleanField, IntegerChoices, ImageField, ManyToManyField
+from django.db.models import ForeignKey, SET_NULL, Model, FileField, UniqueConstraint
+from django.db.models.fields import CharField, SlugField, URLField, PositiveIntegerField, DecimalField
+from django.db.models.fields import PositiveSmallIntegerField, FloatField
 from django.utils.text import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jsonform.models.fields import ArrayField
@@ -19,7 +19,7 @@ class Category(MPTTModel, ImageBaseModel):
     slug = SlugField(max_length=255, unique=True, editable=False)
     deeplink = URLField(null=True, blank=True)
     product_amount = PositiveIntegerField(default=0, editable=False)
-    attribute = JSONField(null=True, blank=True)
+    attribute = ManyToManyField("apps.Attribute", blank=True)
     path = ArrayField(PositiveIntegerField(), default=list, editable=False)
 
 
@@ -38,23 +38,38 @@ class Category(MPTTModel, ImageBaseModel):
     def __str__(self):
         return f"{self.name}"
 
+    class Meta:
+        verbose_name_plural = 'Kategoriylar'
+
+
+class Attribute(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class AttributeValue(Model):
+    attribute = ForeignKey('apps.Attribute', CASCADE, related_name='values')
+    value = CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.value}"
+
 
 class Product(CreatedBaseModel, SlugBaseModel):
-    name = CharField(max_length=90, db_index=True)
+    name = CharField(max_length=90)
     category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
     guarantee = PositiveSmallIntegerField(null=True, blank=True, default=6)
     shop = ForeignKey('apps.Shop', CASCADE, related_name='products')
-    # tovar belgisi
     model = ForeignKey('apps.ProductModel', on_delete=SET_NULL, related_name='products', null=True, blank=True)
     brand = ForeignKey('apps.Brand', on_delete=SET_NULL, related_name='products', null=True, blank=True)
     country = ForeignKey('apps.Country', on_delete=SET_NULL, related_name='products', null=True, blank=True)
     description = CKEditor5Field()
-    sku = CharField(max_length=100)
     comments_count = PositiveSmallIntegerField(default=0)
-    price = BigIntegerField()
-    # 360 gradusli rasm
     short_description = CharField(max_length=390)
     rating = FloatField(default=0)
+    is_active = BooleanField(default=True)
 
     class Meta:
         constraints = [
@@ -65,20 +80,38 @@ class Product(CreatedBaseModel, SlugBaseModel):
         ]
 
 
-class ProductItem(Model):
-    feature = JSONField()
-    quantity = PositiveSmallIntegerField(default=1)
-    price = BigIntegerField()
-    slug = SlugField(max_length=255, unique=True, editable=False)
-    product = ForeignKey('apps.Product', CASCADE, related_name='product_items')
-    price_delta = PositiveBigIntegerField(null=True, blank=True)
-    sku = CharField(max_length=7)
-    attribute = JSONField()
+# class ProductVariant(Model):
+#     feature = JSONField()
+#     quantity = PositiveSmallIntegerField(default=1)
+#     price = BigIntegerField()
+#     slug = SlugField(max_length=255, unique=True, editable=False)
+#     product = ForeignKey('apps.Product', CASCADE, related_name='product_items')
+#     price_delta = PositiveBigIntegerField(null=True, blank=True)
+#     sku = CharField(max_length=7)
+#     attribute = JSONField()
+class ProductVariant(Model):
+    product = ForeignKey('apps.Product', CASCADE, related_name='variants')
+    sku = CharField(max_length=255)
+    price = DecimalField(max_digits=10, decimal_places=2)
+    stock = PositiveSmallIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.sku}"
+
+
+class ProductVariantAttribute(Model):
+    product = ForeignKey('apps.ProductVariant', CASCADE, related_name='attr_variant')
+    attribute = ForeignKey('apps.Attribute', CASCADE, related_name='attributes')
+    value = ForeignKey('apps.AttributeValue', CASCADE, related_name='values')
 
 
 class ProductImage(ImageBaseModel):
-    product_item = ForeignKey('apps.ProductItem', CASCADE, related_name='images', null=True, blank=True)
     product = ForeignKey('apps.Product', CASCADE, related_name='images', null=True, blank=True)
+    # product = ForeignKey('apps.Product', CASCADE, related_name='images', null=True, blank=True)
+
+
+class ProductVariantImage(ImageBaseModel):
+    product = ForeignKey('apps.ProductVariant', CASCADE, related_name='variant_images', null=True, blank=True)
 
 
 class Brand(Model):
