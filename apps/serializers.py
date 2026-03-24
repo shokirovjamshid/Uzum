@@ -266,7 +266,7 @@ class ProductListSerializer(ModelSerializer):
 
     def to_representation(self, instance: Product):
         re = super().to_representation(instance)
-        re['price'] = instance.product_items.first().price
+        re['price'] = instance.variants.first().price
         re['image'] = instance.images.first()
         return re
 

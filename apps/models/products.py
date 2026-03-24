@@ -1,5 +1,5 @@
 from django.db.models import CASCADE, TextField, BooleanField, IntegerChoices, ImageField, ManyToManyField
-from django.db.models import ForeignKey, SET_NULL, Model, FileField, UniqueConstraint
+from django.db.models import ForeignKey, SET_NULL, Model, FileField
 from django.db.models.fields import CharField, SlugField, URLField, PositiveIntegerField, DecimalField
 from django.db.models.fields import PositiveSmallIntegerField, FloatField
 from django.utils.text import slugify

@@ -172,6 +172,7 @@ class CommentCreateAPIView(CreateAPIView):
     queryset = Comment.objects.defer('status')
     serializer_class = CommentCreateModelSerializer
 
+
 @extend_schema(tags=["Product"])
 class ProductModelViewSet(ModelViewSet):
     queryset = Product.objects.all()
