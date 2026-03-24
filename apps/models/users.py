@@ -4,8 +4,8 @@ from django.db.models import ForeignKey, CASCADE
 from django.db.models.fields import BooleanField, DateField
 from django.db.models.fields import FloatField, PositiveIntegerField, TextField
 
-from apps.managers import CustomUserManager, SellerCustomManager, AdminCustomManager
-from apps.models.base import CreatedBaseModel, SlugBaseModel
+from apps.models.managers import CustomUserManager, SellerCustomManager, AdminCustomManager
+from apps.models.base import CreatedBaseModel
 from apps.models.base import ImageBaseModel
 from apps.models.base import SlugBaseModel
 from apps.models.utils import uz_phone_validator
@@ -23,12 +23,22 @@ class User(AbstractUser, ImageBaseModel):
         FEMALE = 0, 'Female'
 
     email = EmailField(unique=True, null=True, blank=True)
-    phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
+    phone = CharField(
+        max_length=12,
+        validators=[uz_phone_validator],
+        unique=True)
     password = CharField(max_length=128, null=True, blank=True)
     is_online = BooleanField(default=False)
     patronymic = CharField(max_length=30, null=True, blank=True)
-    type = CharField(max_length=12, choices=TypeChoice.choices, default=TypeChoice.USER)
-    gender = IntegerField(null=True, blank=True, choices=Gender.choices, help_text='True Male False Female')
+    type = CharField(
+        max_length=12,
+        choices=TypeChoice.choices,
+        default=TypeChoice.USER)
+    gender = IntegerField(
+        null=True,
+        blank=True,
+        choices=Gender.choices,
+        help_text='True Male False Female')
     birth_date = DateField(null=True, blank=True)
     username = None
     USERNAME_FIELD = "phone"
@@ -50,7 +60,10 @@ class Shop(CreatedBaseModel, ImageBaseModel, SlugBaseModel):
     name = CharField(max_length=125)
     seller = ForeignKey('apps.Seller', CASCADE, related_name='shops')
     description = TextField(null=True, blank=True)
-    banner = ImageField(upload_to='seller/banner/%Y/%m/%d', null=True, blank=True)
+    banner = ImageField(
+        upload_to='seller/banner/%Y/%m/%d',
+        null=True,
+        blank=True)
     rating = FloatField(default=0, editable=False)
     comment_count = PositiveIntegerField(default=0, editable=False)
     order_count = PositiveIntegerField(default=0, editable=False)

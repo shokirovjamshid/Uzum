@@ -1,3 +1,5 @@
+from PIL import Image
+from django.core.exceptions import ValidationError
 import os
 from datetime import datetime
 
@@ -13,7 +15,8 @@ uz_phone_validator = RegexValidator(
 
 def upload_image_size_5mb_validator(obj: ImageFieldFile):
     if obj.size > 5 * 1024 * 1024:
-        raise ValidationError(f'This image is too big (max - 5mb) {obj.size / 1024 / 1024:.2f} MB')
+        raise ValidationError(
+            f'This image is too big (max - 5mb) {obj.size / 1024 / 1024:.2f} MB')
     return obj
 
 
@@ -27,10 +30,6 @@ def upload_to_image(obj, filename: str):
     date_path = datetime.now().strftime("%Y/%m/%d")
 
     return f"{_name}/{date_path}/{filename}"
-
-
-from django.core.exceptions import ValidationError
-from PIL import Image
 
 
 def validate_image(image):
@@ -65,7 +64,8 @@ def validate_video(file):
         clip = VideoFileClip(file.temporary_file_path())
         width, height = clip.size
         if width < 1080 or height < 1440:
-            raise ValidationError('Video minimal o‘lchami 1080x1440 bo‘lishi kerak')
+            raise ValidationError(
+                'Video minimal o‘lchami 1080x1440 bo‘lishi kerak')
         if abs((width / height) - (3 / 4)) > 0.01:
             raise ValidationError('Video tomoni 3:4 nisbatda bo‘lishi kerak')
         clip.reader.close()

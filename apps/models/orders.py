@@ -31,14 +31,18 @@ class Order(CreatedBaseModel):
     user = ForeignKey('apps.User', CASCADE, related_name='orders')
     delivery_point = ForeignKey('apps.DeliveryPoint', SET_NULL, null=True)
     payment_type = ForeignKey('apps.PaymentType', SET_NULL, null=True)
-    customer_recipient = ForeignKey('apps.CustomerRecipient', SET_NULL, null=True)
+    customer_recipient = ForeignKey(
+        'apps.CustomerRecipient', SET_NULL, null=True)
     delivery_location = PlainLocationField(based_fields=['address'], zoom=9)
-    status = CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    status = CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING)
 
 
 class OrderItem(Model):
     order = ForeignKey('apps.Order', CASCADE, related_name='order_items')
-    product = ForeignKey('apps.ProductItem', SET_NULL, null=True)
+    product = ForeignKey('apps.ProductVariant', SET_NULL, null=True,related_name='product_items')
     is_comment = BooleanField(default=False)
     quantity = PositiveSmallIntegerField()
     price = BigIntegerField()
@@ -57,7 +61,7 @@ class PaymentType(Model):
 
 
 class CustomerRecipient(Model):
-    name = CharField(max_length=255,db_index=True)
+    name = CharField(max_length=255, db_index=True)
     surname = CharField(max_length=255)
     is_default = BooleanField()
     phone = CharField(max_length=50, validators=[uz_phone_validator])

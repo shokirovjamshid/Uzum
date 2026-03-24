@@ -3,8 +3,6 @@ from datetime import timedelta
 from pathlib import Path
 
 import redis
-from django.templatetags.static import static
-from django.urls import reverse_lazy
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,8 +39,10 @@ INSTALLED_APPS = [
     "unfold.contrib.inlines",  # optional, if special inlines are needed
     "unfold.contrib.import_export",  # optional, if django-import-export package is used
     "unfold.contrib.guardian",  # optional, if django-guardian package is used
-    "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
-    "unfold.contrib.location_field",  # optional, if django-location-field package is used
+    # optional, if django-simple-history package is used
+    "unfold.contrib.simple_history",
+    # optional, if django-location-field package is used
+    "unfold.contrib.location_field",
     "unfold.contrib.constance",  # optional, if django-constance package is used
     'django.contrib.postgres',
     'django.contrib.admin',
@@ -161,7 +161,7 @@ REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
 
 CELERY_BROKER_URL = REDIS_URL
-redis_cache = redis.Redis.from_url(REDIS_URL)
+r = redis.Redis.from_url(REDIS_URL)
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",

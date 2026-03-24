@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from rest_framework.exceptions import ValidationError
 import base64
 import io
@@ -27,5 +26,3 @@ def _status_cache_key(user_id: int) -> str:
 def code_length_validate(value):
     if len(str(value)) != 6:
         raise ValidationError('uzunligi 6 ga teng bolishi kerak')
-
-

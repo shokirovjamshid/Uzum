@@ -15,13 +15,17 @@ from apps.models.utils import validate_video, quality_assessment_validate
 
 class Category(MPTTModel, ImageBaseModel):
     name = CharField(max_length=255)
-    parent = TreeForeignKey('self', on_delete=CASCADE, null=True, blank=True, related_name='subcategory')
+    parent = TreeForeignKey(
+        'self',
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name='subcategory')
     slug = SlugField(max_length=255, unique=True, editable=False)
     deeplink = URLField(null=True, blank=True)
     product_amount = PositiveIntegerField(default=0, editable=False)
     attribute = ManyToManyField("apps.Attribute", blank=True)
     path = ArrayField(PositiveIntegerField(), default=list, editable=False)
-
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -29,7 +33,11 @@ class Category(MPTTModel, ImageBaseModel):
             super().save(*args, **kwargs)
             self.slug = f"{base_slug}-{self.id}"
             kwargs['update_fields'] = ['slug']
-        parent_ids = list(self.get_ancestors(include_self=True).values_list('id', flat=True))
+        parent_ids = list(
+            self.get_ancestors(
+                include_self=True).values_list(
+                'id',
+                flat=True))
         if self.path != parent_ids:
             self.path = parent_ids
             kwargs['update_fields'] += ['path']
@@ -59,25 +67,43 @@ class AttributeValue(Model):
 
 class Product(CreatedBaseModel, SlugBaseModel):
     name = CharField(max_length=90)
-    category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
+    category = ForeignKey(
+        'apps.Category',
+        on_delete=CASCADE,
+        related_name='products')
     guarantee = PositiveSmallIntegerField(null=True, blank=True, default=6)
     shop = ForeignKey('apps.Shop', CASCADE, related_name='products')
-    model = ForeignKey('apps.ProductModel', on_delete=SET_NULL, related_name='products', null=True, blank=True)
-    brand = ForeignKey('apps.Brand', on_delete=SET_NULL, related_name='products', null=True, blank=True)
-    country = ForeignKey('apps.Country', on_delete=SET_NULL, related_name='products', null=True, blank=True)
+    model = ForeignKey(
+        'apps.ProductModel',
+        on_delete=SET_NULL,
+        related_name='products',
+        null=True,
+        blank=True)
+    brand = ForeignKey(
+        'apps.Brand',
+        on_delete=SET_NULL,
+        related_name='products',
+        null=True,
+        blank=True)
+    country = ForeignKey(
+        'apps.Country',
+        on_delete=SET_NULL,
+        related_name='products',
+        null=True,
+        blank=True)
     description = CKEditor5Field()
     comments_count = PositiveSmallIntegerField(default=0)
     short_description = CharField(max_length=390)
     rating = FloatField(default=0)
     is_active = BooleanField(default=True)
 
-    class Meta:
-        constraints = [
-            UniqueConstraint(
-                fields=['sku', 'shop'],
-                name='unique_sku_shop'
-            )
-        ]
+    # class Meta:
+    #     constraints = [
+    #         UniqueConstraint(
+    #             fields=['sku', 'shop'],
+    #             name='unique_sku_shop'
+    #         )
+    #     ]
 
 
 # class ProductVariant(Model):
@@ -100,18 +126,34 @@ class ProductVariant(Model):
 
 
 class ProductVariantAttribute(Model):
-    product = ForeignKey('apps.ProductVariant', CASCADE, related_name='attr_variant')
-    attribute = ForeignKey('apps.Attribute', CASCADE, related_name='attributes')
+    product = ForeignKey(
+        'apps.ProductVariant',
+        CASCADE,
+        related_name='attr_variant')
+    attribute = ForeignKey(
+        'apps.Attribute',
+        CASCADE,
+        related_name='attributes')
     value = ForeignKey('apps.AttributeValue', CASCADE, related_name='values')
 
 
 class ProductImage(ImageBaseModel):
-    product = ForeignKey('apps.Product', CASCADE, related_name='images', null=True, blank=True)
+    product = ForeignKey(
+        'apps.Product',
+        CASCADE,
+        related_name='images',
+        null=True,
+        blank=True)
     # product = ForeignKey('apps.Product', CASCADE, related_name='images', null=True, blank=True)
 
 
 class ProductVariantImage(ImageBaseModel):
-    product = ForeignKey('apps.ProductVariant', CASCADE, related_name='variant_images', null=True, blank=True)
+    product = ForeignKey(
+        'apps.ProductVariant',
+        CASCADE,
+        related_name='variant_images',
+        null=True,
+        blank=True)
 
 
 class Brand(Model):
@@ -123,9 +165,18 @@ class ProductModel(Model):
 
 
 class ProductVideo(Model):
-    video = FileField(upload_to='product/videos/%Y/%m/%d', null=True, blank=True, validators=[validate_video])
-    product_item = ForeignKey('apps.ProductItem', CASCADE, related_name='videos', blank=True, null=True)
-    product = ForeignKey('apps.Product', CASCADE, related_name='videos', blank=True, null=True)
+    video = FileField(
+        upload_to='product/videos/%Y/%m/%d',
+        null=True,
+        blank=True,
+        validators=[validate_video])
+
+    product = ForeignKey(
+        'apps.Product',
+        CASCADE,
+        related_name='videos',
+        blank=True,
+        null=True)
 
 
 class Comment(CreatedBaseModel):
@@ -135,14 +186,22 @@ class Comment(CreatedBaseModel):
 
     user_name = CharField(max_length=100)
     product = ForeignKey('apps.Product', CASCADE, related_name='comments')
-    quality_assessment = PositiveSmallIntegerField(validators=[quality_assessment_validate])
-    user = ForeignKey('apps.User', SET_NULL, related_name='comments', null=True)
-    service_evaluation = PositiveSmallIntegerField(validators=[quality_assessment_validate])
-    delivery_speed_assessment = PositiveSmallIntegerField(validators=[quality_assessment_validate])
+    quality_assessment = PositiveSmallIntegerField(
+        validators=[quality_assessment_validate])
+    user = ForeignKey(
+        'apps.User',
+        SET_NULL,
+        related_name='comments',
+        null=True)
+    service_evaluation = PositiveSmallIntegerField(
+        validators=[quality_assessment_validate])
+    delivery_speed_assessment = PositiveSmallIntegerField(
+        validators=[quality_assessment_validate])
     advantages = TextField()
     disadvantages = TextField()
     comment = TextField()
-    status = PositiveSmallIntegerField(choices=Status.choices, null=True, blank=True)
+    status = PositiveSmallIntegerField(
+        choices=Status.choices, null=True, blank=True)
     is_anonymous = BooleanField(default=False)
 
 
@@ -158,7 +217,10 @@ class FeatureValue(Model):
 
 class ProductFeature(Model):
     product = ForeignKey('apps.Product', CASCADE, related_name='new_features')
-    feature = ForeignKey('apps.Feature', CASCADE, related_name='product_features')
+    feature = ForeignKey(
+        'apps.Feature',
+        CASCADE,
+        related_name='product_features')
 
 
 class Feature(Model):

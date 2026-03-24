@@ -17,13 +17,23 @@ class SlugBaseModel(Model):
     class Meta:
         abstract = True
 
-    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(
+            self,
+            *,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None):
         if self._state.adding:
             if hasattr(self, 'name'):
                 self.slug = slugify(f"{self.name}-{self.id}")
             if hasattr(self, 'title'):
                 self.slug = slugify(f"{self.title}-{self.id}")
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields)
 
 
 class CreatedBaseModel(Model):
@@ -35,16 +45,26 @@ class CreatedBaseModel(Model):
 
 
 class ImageBaseModel(Model):
-    image = ImageField(upload_to=upload_to_image, null=True, blank=True,
-                       validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-                                   upload_image_size_5mb_validator],
-                       help_text="Hajmi 5 mb dan oshmasin va 3x4 bo'lishi kerak.Orqa fon oq bo'lishi kerak")
+    image = ImageField(
+        upload_to=upload_to_image,
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                [
+                    'jpg',
+                    'jpeg',
+                    'png',
+                    'webp']),
+            upload_image_size_5mb_validator],
+        help_text="Hajmi 5 mb dan oshmasin va 3x4 bo'lishi kerak.Orqa fon oq bo'lishi kerak")
 
     class Meta:
         abstract = True
 
     def convert_img_to_webp(self):
-        is_new_upload = isinstance(self.image.file, (InMemoryUploadedFile, TemporaryUploadedFile))
+        is_new_upload = isinstance(
+            self.image.file, (InMemoryUploadedFile, TemporaryUploadedFile))
 
         if self._state.adding or is_new_upload:
             img = Image.open(self.image)
@@ -53,13 +73,25 @@ class ImageBaseModel(Model):
             img.save(buffer, format="WEBP", quality=85)
             buffer.seek(0)
 
-            self.image = ContentFile(buffer.read(), f"{self.image.name.split('.')[0]}.webp")
+            self.image = ContentFile(
+                buffer.read(), f"{
+                    self.image.name.split('.')[0]}.webp")
             buffer.close()
 
-    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(
+            self,
+            *,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None):
         if self.image:
             self.convert_img_to_webp()
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields)
 
 
 class UserQuerySet(QuerySet):

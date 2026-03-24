@@ -25,7 +25,12 @@ class CustomUserManager(UserManager):
         extra_fields.setdefault("type", 'user')
         return self._create_user(phone, email, password, **extra_fields)
 
-    def create_superuser(self, phone, email=None, password=None, **extra_fields):
+    def create_superuser(
+            self,
+            phone,
+            email=None,
+            password=None,
+            **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("type", 'admin')
@@ -47,7 +52,11 @@ class SellerCustomManager(Manager):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         extra_fields.setdefault("type", 'seller')
-        seller = self.model(phone=phone, email=email, password=password, **extra_fields)
+        seller = self.model(
+            phone=phone,
+            email=email,
+            password=password,
+            **extra_fields)
         seller.password = make_password(password)
         seller.save()
         return seller
@@ -62,7 +71,11 @@ class AdminCustomManager(Manager):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         extra_fields.setdefault("type", 'admin')
-        admin = self.model(phone=phone, email=email, password=password, **extra_fields)
+        admin = self.model(
+            phone=phone,
+            email=email,
+            password=password,
+            **extra_fields)
         admin.password = make_password(password)
         admin.save()
         return admin

@@ -12,8 +12,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.models import User
-from apps.serializers import (QRLoginStatusResponseSerializer, QRLoginRequestResponseSerializer,
-                              QRLoginAuthorizeRequestSerializer, RegisterSerializer, )
+from apps.serializers import (
+    QRLoginStatusResponseSerializer,
+    QRLoginRequestResponseSerializer,
+    QRLoginAuthorizeRequestSerializer,
+    RegisterSerializer,
+)
 from apps.tasks import register_key
 from apps.utils import _generate_qr_image_base64
 from root.settings import r
@@ -30,9 +34,11 @@ class RegisterSmsCodeAPIView(APIView):
         key = register_key(phone)
         remaining_time = r.ttl(key)
         if cache.get(key) is None and remaining_time == 2:
-            return Response({'message': 'Tasdiqlash uchun kode yuborildi', "ttl": 300})
+            return Response(
+                {'message': 'Tasdiqlash uchun kode yuborildi', "ttl": 300})
         elif cache.get(key) is None and remaining_time == 1:
-            return Response({'message': 'Tasdiqlash uchun kode yuborildi', "ttl": remaining_time})
+            return Response(
+                {'message': 'Tasdiqlash uchun kode yuborildi', "ttl": remaining_time})
 
 
 @extend_schema(tags=['Auth'])
@@ -50,8 +56,9 @@ class QRCodeLoginRequestView(APIView):
         raw_token = uuid.uuid4().hex
         signed_token = signer.sign(raw_token)
 
-        cache.set(f"auth:qr:{raw_token}", {"status": "pending", "created_at": timezone.now().isoformat()},
-                  timeout=120, )
+        cache.set(
+            f"auth:qr:{raw_token}", {
+                "status": "pending", "created_at": timezone.now().isoformat()}, timeout=120, )
 
         qr_image = _generate_qr_image_base64(signed_token)
 
@@ -80,7 +87,8 @@ class QRCodeLoginAuthorizeView(APIView):
         if not payload:
             return Response({"detail": "Token topilmadi yoki eskirgan."})
 
-        cache.set(key, {"status": "approved", "user_id": request.user.id}, timeout=60)
+        cache.set(key, {"status": "approved",
+                        "user_id": request.user.id}, timeout=60)
         return Response({"status": "Success"})
 
 

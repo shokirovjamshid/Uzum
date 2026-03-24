@@ -119,7 +119,9 @@ class ChatConsumer(CustomAsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def _create_message(self, text: str, image_url: str):
-        room = ChatRoom.objects.select_related("buyer", "seller").get(pk=self.room_id)
+        room = ChatRoom.objects.select_related(
+            "buyer", "seller").get(
+            pk=self.room_id)
         msg = Message.objects.create(
             room=room,
             sender=self.user,
@@ -127,7 +129,9 @@ class ChatConsumer(CustomAsyncJsonWebsocketConsumer):
             image_url=image_url,
         )
 
-        ChatRoom.objects.filter(pk=room.pk).update(last_message_at=timezone.now())
+        ChatRoom.objects.filter(
+            pk=room.pk).update(
+            last_message_at=timezone.now())
 
         return {
             "id": msg.id,

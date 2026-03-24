@@ -43,16 +43,9 @@ class DaysWeekAdmin(ModelAdmin):
     pass
 
 
-@admin.register(Category)
-class CategoryAdmin(ModelAdmin):
-    search_fields = 'name',
-    autocomplete_fields = 'name'
-
-
 @admin.register(Shop)
 class ShopAdmin(ModelAdmin):
     search_fields = 'name',
-    autocomplete_fields = 'name'
 
     # def has_delete_permission(self, request, obj=...):
     #     return super().has_delete_permission(request, obj)
@@ -67,3 +60,19 @@ class ShopAdmin(ModelAdmin):
 @admin.register(Seller)
 class SellerAdmin(ModelAdmin):
     search_fields = 'name',
+
+
+@admin.register(Category)
+class CategoryAdmin(ModelAdmin):
+    list_display = ('name',)
+    search_fields = 'name',
+
+    # def get_queryset(self, request):
+    #     qs = super().get_queryset(request)
+    #     qs = qs.annotate(
+    #         _product_count = Count('products')
+    #     )
+    #     return qs
+    #
+    # def product_count(self,obj):
+    #     return obj._product_count

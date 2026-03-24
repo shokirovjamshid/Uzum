@@ -1,5 +1,4 @@
 from django.core.cache import cache
-from django.template.defaulttags import comment
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField, HiddenField, \
@@ -47,7 +46,17 @@ class MessageSerializer(ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ('id', 'chat', 'sender', 'sender_type', 'text', 'image_url', 'timestamp', 'is_read', 'read_at',)
+        fields = (
+            'id',
+            'chat',
+            'sender',
+            'sender_type',
+            'text',
+            'image_url',
+            'timestamp',
+            'is_read',
+            'read_at',
+        )
 
 
 class ChatRoomListSerializer(Serializer):
@@ -58,7 +67,13 @@ class ChatRoomListSerializer(Serializer):
 
     class Meta:
         model = ChatRoom
-        fields = ['id', 'partner_name', 'partner_image', 'last_message', 'unread_count', 'last_message_at']
+        fields = [
+            'id',
+            'partner_name',
+            'partner_image',
+            'last_message',
+            'unread_count',
+            'last_message_at']
 
     def get_partner_name(self, obj):
         user = self.context['request'].user
@@ -87,35 +102,47 @@ class ChatRoomSerializer(ModelSerializer):
         fields = ('id', 'buyer', 'shop', 'last_message_at', 'last_message',)
 
     def get_last_message(self, obj):
-        message = getattr(obj, "_last_message", None) or obj.messages.order_by('-timestamp').first()
+        message = getattr(
+            obj,
+            "_last_message",
+            None) or obj.messages.order_by('-timestamp').first()
         if not message:
             return None
         return MessageSerializer(message).data
 
 
 class QRLoginRequestResponseSerializer(Serializer):
-    token = CharField(help_text="Statusni tekshirish uchun ishlatiladigan UUID")
+    token = CharField(
+        help_text="Statusni tekshirish uchun ishlatiladigan UUID")
     qr_image = CharField(help_text="Base64 formatidagi QR rasm")
 
 
 class QRLoginAuthorizeRequestSerializer(serializers.Serializer):
-    token = CharField(help_text="QR koddan o'qib olingan imzolangan (signed) token")
+    token = CharField(
+        help_text="QR koddan o'qib olingan imzolangan (signed) token")
 
     def validate_token(self, value):
         if not value:
-            raise serializers.ValidationError("Token bo'sh bo'lishi mumkin emas.")
+            raise serializers.ValidationError(
+                "Token bo'sh bo'lishi mumkin emas.")
         return value
 
 
 class QRLoginStatusResponseSerializer(Serializer):
-    status = ChoiceField(choices=["pending", "approved", "expired"], help_text="Login holati")
+    status = ChoiceField(
+        choices=[
+            "pending",
+            "approved",
+            "expired"],
+        help_text="Login holati")
     access = CharField(required=False, allow_null=True)
     refresh = CharField(required=False, allow_null=True)
 
     def validate(self, data):
         if data.get("status") == "approved":
             if not data.get("access") or not data.get("refresh"):
-                raise serializers.ValidationError("Tasdiqlangan login uchun tokenlar taqdim etilishi shart.")
+                raise serializers.ValidationError(
+                    "Tasdiqlangan login uchun tokenlar taqdim etilishi shart.")
         return data
 
 
@@ -162,7 +189,8 @@ class FavoriteListProductModelSerializer(DynamicFieldsModelSerializer):
     def save(self, **kwargs):
         product = kwargs.get('product')
         user = kwargs.get('user')
-        obj, created = self.Meta.model.objects.get_or_create(product=product, user=user)
+        obj, created = self.Meta.model.objects.get_or_create(
+            product=product, user=user)
         if not created:
             obj.delete()
             return Favorite(user=user, product=product)
@@ -179,7 +207,8 @@ class FavoriteRetrieveProductSerializer(DynamicFieldsModelSerializer):
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         user = self.context['request'].user
-        cart_item = CartItem.objects.filter(card__user=user, product=instance.product).only('quantity').first()
+        cart_item = CartItem.objects.filter(
+            card__user=user, product=instance.product).only('quantity').first()
         if cart_item:
             repr['quantity'] = cart_item.quantity
         else:
@@ -223,7 +252,10 @@ class RegisterSerializer(ModelSerializer):
     def to_representation(self, instance: User):
         re = super().to_representation(instance)
         refresh = RefreshToken.for_user(instance)
-        re['data'] = {'refresh token': str(refresh), 'access token': str(refresh.access_token)}
+        re['data'] = {
+            'refresh token': str(refresh),
+            'access token': str(
+                refresh.access_token)}
         return re
 
 
@@ -274,7 +306,9 @@ class CommentCreateModelSerializer(ModelSerializer):
     def validate(self, attrs):
         user = attrs.get('user')
         product = attrs.get('product')
-        if not OrderItem.objects.filter(product=product, order__user=user).exists():
+        if not OrderItem.objects.filter(
+                product=product,
+                order__user=user).exists():
             raise ValidationError('Siz kommit yoza olmaysiz')
         return super().validate(attrs)
 
@@ -285,8 +319,11 @@ class CommentCreateModelSerializer(ModelSerializer):
         user_name = 'Anonim'
         if not is_anonymous:
             user_name = user.first_name
-        comments = self.Meta.model.objects.create(**validated_data, user_name=user_name)
-        comments_list = [CommentImage(comment=comments, image=image) for image in images]
+        comments = self.Meta.model.objects.create(
+            **validated_data, user_name=user_name)
+        comments_list = [
+            CommentImage(
+                comment=comments,
+                image=image) for image in images]
         CommentImage.objects.bulk_create(comments_list)
         return comments
-

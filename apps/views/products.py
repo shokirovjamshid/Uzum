@@ -14,12 +14,19 @@ from rest_framework.viewsets import ModelViewSet
 from apps.filters import ProductFiterSet
 from apps.models import City, DeliveryPoint, Category, User, Product, Shop, Favorite, Seller, Comment
 from apps.permissions import SellerBasePermission, SellerCreateBasePermission
-from apps.serializers import (CityListModelSerializer,
-                              DeliveryPointsListModelSerializer, DeliveryPointsRetrieveModelSerializer,
-                              ProductListSerializer,
-                              CategoryModelSerializer, ShopRetrieveUpdateDestroySerializer, ShopListCreateSerializer,
-                              CommentListModelSerializer, CommentCreateModelSerializer,
-                              FavoriteListProductModelSerializer, FavoriteRetrieveProductSerializer, )
+from apps.serializers import (
+    CityListModelSerializer,
+    DeliveryPointsListModelSerializer,
+    DeliveryPointsRetrieveModelSerializer,
+    ProductListSerializer,
+    CategoryModelSerializer,
+    ShopRetrieveUpdateDestroySerializer,
+    ShopListCreateSerializer,
+    CommentListModelSerializer,
+    CommentCreateModelSerializer,
+    FavoriteListProductModelSerializer,
+    FavoriteRetrieveProductSerializer,
+)
 
 signer = TimestampSigner()
 
@@ -34,7 +41,8 @@ class CityListAPIView(ListAPIView):
 
 @extend_schema(tags=['delivery point'])
 class DeliveryPointsListAPIView(ListAPIView):
-    queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location')
+    queryset = DeliveryPoint.objects.only(
+        'address', 'has_dressing_room', 'location')
     serializer_class = DeliveryPointsListModelSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["city"]
@@ -42,7 +50,11 @@ class DeliveryPointsListAPIView(ListAPIView):
 
 @extend_schema(tags=['delivery point'])
 class DeliveryPointsRetrieveAPIView(RetrieveAPIView):
-    queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location', 'order_retention_period')
+    queryset = DeliveryPoint.objects.only(
+        'address',
+        'has_dressing_room',
+        'location',
+        'order_retention_period')
     serializer_class = DeliveryPointsRetrieveModelSerializer
 
 
@@ -54,7 +66,8 @@ class CategoryListAPIView(ListAPIView):
     def list(self, request, *args, **kwargs):
         tree = cache.get('categories_key')
         if tree is None:
-            queryset = self.filter_queryset(self.get_queryset()).prefetch_related('subcategory')
+            queryset = self.filter_queryset(
+                self.get_queryset()).prefetch_related('subcategory')
             tree = get_cached_trees(queryset)
             cache.set('categories_key', tree, 360)
         serializer = self.get_serializer(tree, many=True)
@@ -139,13 +152,19 @@ class ShopListCreateAPIView(ListCreateAPIView):
 
 @extend_schema(tags=["Product"])
 class CommentListAPIView(ListAPIView):
-    queryset = Comment.objects.defer('is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'user',
-                                     'updated_at').prefetch_related('images')
+    queryset = Comment.objects.defer(
+        'is_anonymous',
+        'service_evaluation',
+        'delivery_speed_assessment',
+        'user',
+        'updated_at').prefetch_related('images')
     serializer_class = CommentListModelSerializer
 
     def get_queryset(self):
         query = super().get_queryset()
-        return query.filter(product__slug=self.kwargs.get('slug'), status=Comment.Status.PUBLISHED)
+        return query.filter(
+            product__slug=self.kwargs.get('slug'),
+            status=Comment.Status.PUBLISHED)
 
 
 @extend_schema(tags=["Product"])
@@ -153,15 +172,13 @@ class CommentCreateAPIView(CreateAPIView):
     queryset = Comment.objects.defer('status')
     serializer_class = CommentCreateModelSerializer
 
-
+@extend_schema(tags=["Product"])
 class ProductModelViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFiterSet
     lookup_url_kwarg = 'slug'
-
-    # http_method_names = 'get',
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

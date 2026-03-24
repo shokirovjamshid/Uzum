@@ -27,12 +27,14 @@ class ImageUploadView(APIView):
     def post(self, request, *args, **kwargs):
         file_obj = request.FILES.get("image")
         if not file_obj:
-            return Response({"detail": "No image file provided."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "No image file provided."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         path = default_storage.save(f"consumers/{file_obj.name}", file_obj)
         image_url = default_storage.url(path)
 
-        return Response({"image_url": image_url}, status=status.HTTP_201_CREATED)
+        return Response({"image_url": image_url},
+                        status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=["Chat"])
@@ -41,12 +43,22 @@ class ChatRoomListView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        qs = ChatRoom.objects.filter(Q(buyer=user) | Q(shop__seller__user=user))
+        qs = ChatRoom.objects.filter(
+            Q(buyer=user) | Q(shop__seller__user=user))
 
-        qs = qs.annotate(unread_count=Count('messages', filter=Q(messages__is_read=False) & ~Q(messages__sender=user)))
+        qs = qs.annotate(
+            unread_count=Count(
+                'messages', filter=Q(
+                    messages__is_read=False) & ~Q(
+                    messages__sender=user)))
 
-        return qs.prefetch_related(Prefetch('messages', queryset=Message.objects.order_by('-timestamp'),
-                                            to_attr='latest_message')).select_related('buyer', 'shop')
+        return qs.prefetch_related(
+            Prefetch(
+                'messages',
+                queryset=Message.objects.order_by('-timestamp'),
+                to_attr='latest_message')).select_related(
+            'buyer',
+            'shop')
 
 
 @extend_schema(tags=["Chat"])
@@ -57,11 +69,13 @@ class ChatRoomGetOrCreateView(GenericAPIView):
         try:
             store = Shop.objects.get(id=shop_id)
         except Shop.DoesNotExist:
-            return Response({"error": "Shop topilmadi"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Shop topilmadi"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         room, created = ChatRoom.objects.get_or_create(buyer=user, shop=store)
 
-        return Response({"room_id": room.id, "is_new": created}, status=status.HTTP_200_OK)
+        return Response({"room_id": room.id, "is_new": created},
+                        status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=["Chat"])
@@ -77,7 +91,9 @@ class ChatHistoryView(ListAPIView):
 
     def get_queryset(self):
         room_id = self.kwargs["room_id"]
-        qs = Message.objects.filter(room_id=room_id).select_related("chat", "sender")
+        qs = Message.objects.filter(
+            room_id=room_id).select_related(
+            "chat", "sender")
 
         before_id = self.request.query_params.get("before_id")
         if before_id:
