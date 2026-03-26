@@ -161,7 +161,8 @@ REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
 
 CELERY_BROKER_URL = REDIS_URL
-r = redis.Redis.from_url(REDIS_URL)
+r = redis.Redis.from_url(REDIS_URL,decode_responses=True )
+TIME_OUT = 300
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -234,7 +235,6 @@ UNFOLD = {
         "show_all_applications": True,
     }
 }
-
 # LOGGING = {
 #     'version': 1,
 #     'filters': {

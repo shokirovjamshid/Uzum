@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField, HiddenField, \
@@ -11,6 +10,7 @@ from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, C
 from apps.models.chats import Message, ChatRoom
 from apps.models.utils import uz_phone_validator
 from apps.tasks import register_key
+from root.settings import r
 
 
 class CityListModelSerializer(ModelSerializer):
@@ -230,7 +230,7 @@ class CategoryModelSerializer(ModelSerializer):
         return []
 
 
-class RegisterSerializer(ModelSerializer):
+class RegisterModelSerializer(ModelSerializer):
     phone = CharField(max_length=12, validators=[uz_phone_validator])
     code = IntegerField(min_value=100000, max_value=999999, write_only=True)
 
@@ -241,12 +241,19 @@ class RegisterSerializer(ModelSerializer):
     def validate(self, attrs):
         phone = attrs.get('phone')
         code = attrs.pop('code')
-        if cache.get(register_key(phone)) != code:
-            raise ValidationError("Noto'g'ri kode")
+        key = register_key(phone)
+        is_available_code = r.get(key)
+        remaining_time = r.ttl(key)
+        if not is_available_code:
+            raise ValidationError({"message": "Kod muddati tugagan yoki yuborilmagan", "ttl": 0})
+        if is_available_code != str(code):
+            raise ValidationError({"message": "Kod muddati bor sizga yuborilgan...", "ttl": remaining_time})
         return super().validate(attrs)
 
     def create(self, validated_data):
+        phone = validated_data.get('phone')
         user, _ = self.Meta.model.objects.get_or_create(**validated_data)
+        r.delete(register_key(phone))
         return user
 
     def to_representation(self, instance: User):

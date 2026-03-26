@@ -16,11 +16,11 @@ from apps.serializers import (
     QRLoginStatusResponseSerializer,
     QRLoginRequestResponseSerializer,
     QRLoginAuthorizeRequestSerializer,
-    RegisterSerializer,
+    RegisterModelSerializer,
 )
-from apps.tasks import register_key
+from apps.tasks import register_sms, register_key
 from apps.utils import _generate_qr_image_base64
-from root.settings import r
+from root.settings import r, TIME_OUT
 
 signer = TimestampSigner()
 
@@ -28,23 +28,23 @@ signer = TimestampSigner()
 @extend_schema(tags=['Auth'])
 class RegisterSmsCodeAPIView(APIView):
     def get(self, request, phone):
-
         if request.user.is_authenticated:
             return Response({'message': "Royhatdan o'tgansiz"})
         key = register_key(phone)
         remaining_time = r.ttl(key)
-        if cache.get(key) is None and remaining_time == 2:
+        if remaining_time > 0:
             return Response(
-                {'message': 'Tasdiqlash uchun kode yuborildi', "ttl": 300})
-        elif cache.get(key) is None and remaining_time == 1:
-            return Response(
-                {'message': 'Tasdiqlash uchun kode yuborildi', "ttl": remaining_time})
+                {'message': 'Tasdiqlash uchun kode yuborilgan', 'ttl': remaining_time, }, status=429)
+
+        register_sms.delay(phone)
+        return Response(
+            {'message': 'Tasdiqlash uchun kode yuborildi', 'ttl': TIME_OUT})
 
 
 @extend_schema(tags=['Auth'])
 class RegisterAPIView(CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+    serializer_class = RegisterModelSerializer
 
 
 @extend_schema(tags=["Auth"])

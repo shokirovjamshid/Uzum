@@ -52,7 +52,6 @@ Task:
 9.Input JS ✅
 10.Querysetni to'g'irlash ya'ni (User.admins.all())desak faqat adminlarni yoki (User.users.all()) desak userlarni olib kelishi kerak ✅
 12.Faqat sellerda balance bor
-13.CategoryImage qo'shish kerak
 14.Ishlab chiqirlgan mamalakat ✅
 15.User modelni bo'lish ✅
 16.Postgres ni bo'lish (pgpool) bilan high load uchun
@@ -64,7 +63,7 @@ Task:
 21.Flask8 ,isort
 22.docker ignoreni to'g'irlash ✅
 23.get_ttl ya'ni sms ko'dni qolgan vaqtini ko'rish
-24.Ordering ya'ni Arzonroq,qimmatroq, degan joyi
+24.product list ya'ni Arzonroq,qimmatroq, degan joyi
 25.pip install pytest-drf
 26.Uzum searchni bo'laklash ya'ni 4ta 4ta qilib olish
 autoflake --in-place --remove-all-unused-imports --remove-unused-variables --ignore-init-module-imports --exclude="*migrations*" -r . && autopep8 --in-place --recursive --aggressive --aggressive --exclude="*migrations*" .

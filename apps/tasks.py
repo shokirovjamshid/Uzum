@@ -1,7 +1,8 @@
 from random import randint
 
 from celery import shared_task
-from django.core.cache import cache
+
+from root.settings import TIME_OUT, r
 
 
 def register_key(phone):
@@ -17,8 +18,15 @@ def send_sms_code(phone, msg):
 def register_sms(phone):
     code = randint(100000, 999999)
     key = register_key(phone)
-    if not cache.get(key):
-        cache.set(key, code, 300)
+    is_set = r.set(key, code, ex=int(TIME_OUT), nx=True)
+    if is_set:
+        code_to_send = code
+    else:
+        code_to_send = r.get(key)
+        if r.ttl(key) == -1:
+            r.expire(key, int(TIME_OUT))
+    # if not cache.get(key):
+    #     cache.set(key, code, TIME_OUT)
 
-    text = f"Tasdiqlash kodi: {code}"
+    text = f"Tasdiqlash kodi: {code_to_send}"
     send_sms_code.delay(phone, text)

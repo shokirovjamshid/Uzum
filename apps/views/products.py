@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from mptt.utils import get_cached_trees
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
@@ -177,8 +177,9 @@ class CommentCreateAPIView(CreateAPIView):
 class ProductModelViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend,OrderingFilter]
     filterset_class = ProductFiterSet
+    ordering_fields = 'created_at',
     lookup_url_kwarg = 'slug'
 
     def get_serializer_class(self):
