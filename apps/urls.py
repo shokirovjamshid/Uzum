@@ -19,6 +19,7 @@ from apps.views import (
     QRCodeLoginAuthorizeView,
     QRCodeLoginStatusView, ChatHistoryListAPIView, UserChatRoomListAPIView,
 )
+from apps.views.chats import SellerChatRoomListAPIView
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -38,7 +39,7 @@ urlpatterns = [
     # Chat REST API
     path("rooms/", UserChatRoomListAPIView.as_view(), name="chat_room_list"),
     path("rooms/<int:pk>/historys", ChatHistoryListAPIView.as_view(), name="chat_history"),
-    path("shops/<slug:slug>/rooms/<int:pk>/historys", ChatHistoryListAPIView.as_view(), name="chat_history"),
+    path("shops/<slug:slug>/rooms/", SellerChatRoomListAPIView.as_view(), name="seller_room_list"),
 
     # Products
     path("user/favorites/", FavoriteProductListCreateAPIView.as_view(), name="product_list"),
