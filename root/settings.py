@@ -215,6 +215,15 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+# settings.py
+
+DEFAULT_FILE_STORAGE = STORAGES.get("default", {}).get(
+    "BACKEND", "django.core.files.storage.FileSystemStorage"
+)
+
+STATICFILES_STORAGE = STORAGES.get("staticfiles", {}).get(
+    "BACKEND", "django.contrib.staticfiles.storage.StaticFilesStorage"
+)
 # ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
 # ES_INDEX = os.getenv("ELASTICSEARCH_PRODUCT_INDEX", "products")
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')

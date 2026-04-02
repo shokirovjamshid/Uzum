@@ -75,7 +75,7 @@ class ImageBaseModel(Model):
 
             self.image = ContentFile(
                 buffer.read(), f"{
-                    self.image.name.split('.')[0]}.webp")
+                self.image.name.split('.')[0]}.webp")
             buffer.close()
 
     def save(

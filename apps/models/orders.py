@@ -42,7 +42,7 @@ class Order(CreatedBaseModel):
 
 class OrderItem(Model):
     order = ForeignKey('apps.Order', CASCADE, related_name='order_items')
-    product = ForeignKey('apps.ProductVariant', SET_NULL, null=True,related_name='product_items')
+    product = ForeignKey('apps.ProductVariant', SET_NULL, null=True, related_name='product_items')
     is_comment = BooleanField(default=False)
     quantity = PositiveSmallIntegerField()
     price = BigIntegerField()

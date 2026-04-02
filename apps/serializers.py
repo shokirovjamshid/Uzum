@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField, HiddenField, \
@@ -42,56 +45,25 @@ class DeliveryPointsRetrieveModelSerializer(ModelSerializer):
 
 
 class MessageSerializer(ModelSerializer):
-    sender_type = CharField(source='sender.type', read_only=True)
-
     class Meta:
         model = Message
-        fields = (
-            'id',
-            'chat',
-            'sender',
-            'sender_type',
-            'text',
-            'image_url',
-            'timestamp',
-            'is_read',
-            'read_at',
-        )
+        fields = ('id', 'chat', 'sender', 'text', 'image', 'created_at', 'is_read')
 
 
-class ChatRoomListSerializer(Serializer):
-    partner_name = SerializerMethodField()
-    partner_image = SerializerMethodField()
-    last_message = SerializerMethodField()
-    unread_count = IntegerField(read_only=True)
-
+class ChatRoomModelSerializer(ModelSerializer):
     class Meta:
         model = ChatRoom
-        fields = [
-            'id',
-            'partner_name',
-            'partner_image',
-            'last_message',
-            'unread_count',
-            'last_message_at']
+        fields = '__all__'
+        ordering = 'last_message_at',
 
-    def get_partner_name(self, obj):
-        user = self.context['request'].user
-        if obj.buyer == user:
-            return obj.store.name
-        return obj.buyer.phone
-
-    def get_partner_image(self, obj):
-        user = self.context['request'].user
-        if obj.buyer == user:
-            return obj.store.logo.url if obj.store.logo else None
-        return None
-
-    def get_last_message(self, obj):
-        last_msg = getattr(obj, 'latest_message', None)
-        if last_msg:
-            return last_msg[0].text if last_msg[0].text else "Rasm yuborildi"
-        return None
+    def to_representation(self, instance: ChatRoom):
+        repr = super().to_representation(instance)
+        repr['last_message_at'] = instance.last_message_at.date() if instance.last_message_at + timedelta(
+            days=1) < now() else instance.last_message_at.time().strftime('%H:%M')
+        last_message = instance.messages.order_by('-created_at').first().text
+        repr['last_message'] = last_message if last_message else '🌄'
+        repr['message_not_read_count'] = instance.messages.filter(is_read=False).count()
+        return repr
 
 
 class ChatRoomSerializer(ModelSerializer):
@@ -105,7 +77,7 @@ class ChatRoomSerializer(ModelSerializer):
         message = getattr(
             obj,
             "_last_message",
-            None) or obj.messages.order_by('-timestamp').first()
+            None) or obj.messages.order_by('-created_at').first()
         if not message:
             return None
         return MessageSerializer(message).data

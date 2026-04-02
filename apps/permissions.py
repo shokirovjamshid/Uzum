@@ -17,3 +17,7 @@ class SellerCreateBasePermission(BasePermission):
         if request.method in SAFE_METHODS and request.user.type == User.TypeChoice.ADMIN:
             return True
         return request.user.type == User.TypeChoice.SELLER
+
+class IsSellerUser(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user.type == User.TypeChoice.SELLER
