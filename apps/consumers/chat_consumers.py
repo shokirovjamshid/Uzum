@@ -35,7 +35,6 @@ class ChatConsumer(CustomAsyncJsonWebsocketConsumer):
             if self.user.type == User.TypeChoice.USER:
                 self.chat, created = await ChatRoom.objects.aget_or_create(buyer=self.user, shop=self.shop)
                 receiver_id = await sync_to_async(lambda: self.shop.seller.user_id)()
-                print(receiver_id)
             if self.user.type == User.TypeChoice.SELLER:
                 receiver_id = content.get("user_id")
                 self.chat, created = await ChatRoom.objects.aget_or_create(buyer=receiver_id, shop=self.shop)
