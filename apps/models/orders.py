@@ -34,10 +34,7 @@ class Order(CreatedBaseModel):
     customer_recipient = ForeignKey(
         'apps.CustomerRecipient', SET_NULL, null=True)
     delivery_location = PlainLocationField(based_fields=['address'], zoom=9)
-    status = CharField(
-        max_length=10,
-        choices=Status.choices,
-        default=Status.PENDING)
+    status = CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
 
 
 class OrderItem(Model):

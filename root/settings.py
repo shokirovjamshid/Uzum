@@ -4,7 +4,6 @@ from pathlib import Path
 
 import redis
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -161,7 +160,7 @@ REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
 
 CELERY_BROKER_URL = REDIS_URL
-r = redis.Redis.from_url(REDIS_URL,decode_responses=True )
+r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 TIME_OUT = 300
 CACHES = {
     "default": {
@@ -202,11 +201,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=240),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=240),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1000),
 }
 
-# eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9.eyJhaWQiOjAsImNhcCI6MCwiaWF0IjoxLjc3MDgzNjY2MTg3OTEwMDkzNWU5LCJpc3MiOiJzdWJuZXRAbWluLmlvIiwibGlkIjoiN2UzZTNiMTEtNjJkNi00ZDhkLWEzY2EtZWE1M2U0OTRjNjNmIiwib3JnIjoiIiwicGxhbiI6IkZSRUUiLCJzdWIiOiJzaG9raXJvdmphbXNoaWQ1NTVAZ21haWwuY29tIiwidHJpYWwiOmZhbHNlfQ.tOLST1cUsH0b8eUoAy86U_T3GlJ93gUCkEyyyPB0OUBhMI8Agp8lccD8khaFbaVh1vZmdWpbY7-ltxZGXCLc10tNNkLqmMgWgsJ8DC0hPNU2WpI0VHfUlfi_PW75Ogxu
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -265,3 +263,10 @@ UNFOLD = {
 #         }
 #     }
 # }
+
+
+# seller # eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzk1OTM3MTI2LCJpYXQiOjE3NzUyMDExMjYsImp0aSI6IjJkZGZiNzc2ZjZlMjRjZGM5Nzk1ZGY4YmEzYTNlYzNhIiwidXNlcl9pZCI6IjMifQ.HMV1G8PdTWZKfNQzkhaKJ75c7_Pj039zGDBFiCx4T5I
+
+# user1  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzk1OTM3MjQ3LCJpYXQiOjE3NzUyMDEyNDcsImp0aSI6IjdmYmE2ODgxY2M0ZjRjNGI5MmJiOTc2NWZmOGM3ODg5IiwidXNlcl9pZCI6IjEifQ.dNSoRpvF2UeEDTPZKnZVgjjDagDRbpf0dI8VuOb2dMs
+
+# user2  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzk1OTM3MzU3LCJpYXQiOjE3NzUyMDEzNTcsImp0aSI6ImRkMTFhNjM1ZGFhYTRmMWZhMzU0OWY4ZjU0MWE4NWYzIiwidXNlcl9pZCI6IjQifQ.QANf8AUpvF4w6fYjeQfavqFXuYp2zFymTblbtMHKgr8

@@ -10,10 +10,7 @@ class DeliveryPointsComment(Model):
         WARNING = 'warning', 'Warning'
         INFO = 'info', 'Information'
 
-    delivery_point = ForeignKey(
-        'apps.DeliveryPoint',
-        on_delete=CASCADE,
-        related_name='comments')
+    delivery_point = ForeignKey('apps.DeliveryPoint', on_delete=CASCADE, related_name='comments')
     type = CharField(max_length=30, choices=CommentTypes.choices)
     text = TextField()
 
@@ -29,21 +26,13 @@ class DeliveryPoint(Model):
         UZ_POST = 'UZ_POST', "O'zbekiston pochta"
 
     address = CharField(max_length=255)
-    city = ForeignKey(
-        'apps.City',
-        on_delete=CASCADE,
-        related_name='delivery_points')
+    city = ForeignKey('apps.City', on_delete=CASCADE, related_name='delivery_points')
     location = PlainLocationField(based_fields=['address'], zoom=9)
     time_from = TimeField()
     time_to = TimeField()
     has_dressing_room = BooleanField()
-    post_paid_availability = CharField(
-        choices=PaidAvailabilityChoices.choices,
-        default=PaidAvailabilityChoices.CASH)
-    type = CharField(
-        max_length=40,
-        choices=TypeChoices.choices,
-        default=TypeChoices.DELIVERY_POINT)
+    post_paid_availability = CharField(choices=PaidAvailabilityChoices.choices, default=PaidAvailabilityChoices.CASH)
+    type = CharField(max_length=40, choices=TypeChoices.choices, default=TypeChoices.DELIVERY_POINT)
     title = CharField(max_length=255)
     order_retention_period = SmallIntegerField()
 
@@ -53,23 +42,14 @@ class DaysWeek(Model):
 
 
 class Weekday(Model):
-    delivery_point = ForeignKey(
-        'apps.DeliveryPoint',
-        CASCADE,
-        related_name='weekdays')
-    day = ForeignKey(
-        'apps.DaysWeek',
-        on_delete=CASCADE,
-        related_name='weekdays')
+    delivery_point = ForeignKey('apps.DeliveryPoint', CASCADE, related_name='weekdays')
+    day = ForeignKey('apps.DaysWeek', on_delete=CASCADE, related_name='weekdays')
     day_off = BooleanField(default=False)
     working_hours = CharField(max_length=255, null=True, blank=True)
 
 
 class WeekdaysInfo(Model):
-    delivery_point = ForeignKey(
-        'apps.DeliveryPoint',
-        CASCADE,
-        related_name='weekdaysInfo')
+    delivery_point = ForeignKey('apps.DeliveryPoint', CASCADE, related_name='weekdaysInfo')
     day_range = CharField(max_length=100)
     day_off = BooleanField(default=False)
     working_hours = CharField(max_length=255)

@@ -54,3 +54,4 @@ class Shop(CreatedBaseModel, ImageBaseModel, SlugBaseModel):
     rating = FloatField(default=0, editable=False)
     comment_count = PositiveIntegerField(default=0, editable=False)
     order_count = PositiveIntegerField(default=0, editable=False)
+    is_online = BooleanField(default=False)
