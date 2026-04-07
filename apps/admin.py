@@ -4,6 +4,7 @@ from unfold.admin import ModelAdmin
 
 from apps.forms import CustomUserChangeForm, CustomUserCreationForm
 from apps.models import City, DaysWeek, User, Category, Shop, Seller
+from apps.models.products import Attribute, AttributeValue
 
 
 @admin.register(User)
@@ -62,6 +63,7 @@ class SellerAdmin(ModelAdmin):
     search_fields = 'name',
 
 
+
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
     list_display = ('name',)
@@ -76,3 +78,15 @@ class CategoryAdmin(ModelAdmin):
     #
     # def product_count(self,obj):
     #     return obj._product_count
+
+class AttributeValueInline(admin.StackedInline):
+    model = AttributeValue
+
+@admin.register(Attribute)
+class AttributeAdmin(admin.ModelAdmin):
+    inlines = AttributeValueInline,
+
+
+# @admin.register()
+# class Admin(admin.ModelAdmin):
+    
