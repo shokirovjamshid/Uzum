@@ -1,7 +1,11 @@
+from django.core.files.storage import default_storage
 from django.core.signing import TimestampSigner
 from drf_spectacular.utils import extend_schema
+from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.models.chats import ChatRoom, Message
 from apps.paginations import CommentPagination
@@ -12,22 +16,18 @@ from apps.serializers import (MessageSerializer, ChatRoomModelSerializer,
 signer = TimestampSigner()
 
 
-# @extsignerend_schema(tags=["Chat"], )
-# class ImageUploadView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     serializer_class = MessageSerializer
-#
-#     def post(self, request, *args, **kwargs):
-#         file_obj = request.FILES.get("image")
-#         if not file_obj:
-#             return Response({"detail": "No image file provided."},
-#                             status=status.HTTP_400_BAD_REQUEST)
-#
-#         path = default_storage.save(f"consumers/{file_obj.name}", file_obj)
-#         image_url = default_storage.url(path)
-#
-#         return Response({"image_url": image_url},
-#                         status=status.HTTP_201_CREATED)
+@extend_schema(tags=["Chat"])
+class ImageUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MessageSerializer
+
+    def post(self, request, *args, **kwargs):
+        file_obj = request.FILES.get("image")
+        if not file_obj:
+            return Response({"detail": "No image file provided."}, status=status.HTTP_400_BAD_REQUEST)
+        path = default_storage.save(f"consumers/{file_obj.name}", file_obj)
+        image_url = default_storage.url(path)
+        return Response({"image_url": image_url}, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=["Chat"])

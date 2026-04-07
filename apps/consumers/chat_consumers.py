@@ -1,7 +1,7 @@
 from asgiref.sync import sync_to_async
 
 from apps.consumers.base import CustomAsyncJsonWebsocketConsumer
-from apps.models import ChatRoom, User, Shop
+from apps.models import ChatRoom, Shop
 
 
 class ChatConsumer(CustomAsyncJsonWebsocketConsumer):
@@ -15,27 +15,33 @@ class ChatConsumer(CustomAsyncJsonWebsocketConsumer):
             await self.close()
             return
         self.group_name = f"shop_{self.slug}_{self.user.id}"
-        if self.user.type == User.TypeChoice.SELLER and self.shop.seller.user != self.user:
+        if self.user.is_seller and self.shop.seller.user != self.user:
             await self.close()
             return
 
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
-        await self.update_is_online(True)
+        await self.update_is_online()
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
         await self.update_is_online(False)
 
     async def receive_json(self, content, **kwargs):
+        """
+
+        user -> seller   {"message":"", "image":""}
+        seller -> user   {"user_id":0, "message":"", "image":""}
+
+        """
         is_me = content.get("is_me")
         if not is_me:
             message = content.get("message")
             image = content.get("image")
-            if self.user.type == User.TypeChoice.USER:
+            if self.user.is_user:
                 self.chat, created = await ChatRoom.objects.aget_or_create(buyer=self.user, shop=self.shop)
                 receiver_id = await sync_to_async(lambda: self.shop.seller.user_id)()
-            if self.user.type == User.TypeChoice.SELLER:
+            if self.user.is_seller:
                 receiver_id = content.get("user_id")
                 self.chat, created = await ChatRoom.objects.aget_or_create(buyer=receiver_id, shop=self.shop)
 
@@ -57,14 +63,7 @@ class ChatConsumer(CustomAsyncJsonWebsocketConsumer):
             message_id = content.get("message_id")
 
     async def chat_message(self, event):
-        await self.send_json({
-            "message": event.get("message"),
-            "image": event.get("image"),
-            "is_me": False,
-        })
+        await self.send_json(message=event.get("message"), image=event.get("image"), is_me=False)
 
     async def me_message(self, event):
-        await self.send_json({
-            "message_id": event.get("message_id"),
-            "is_me": True,
-        })
+        await self.send_json(message_id=event.get("message_id"), is_me=True)

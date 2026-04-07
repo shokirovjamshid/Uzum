@@ -40,6 +40,14 @@ class User(AbstractUser, ImageBaseModel):
     def is_admin(self):
         return self.type == self.TypeChoice.ADMIN or self.is_superuser
 
+    @property
+    def is_user(self):
+        return self.type == self.TypeChoice.USER
+
+    @property
+    def is_seller(self):
+        return self.type == self.TypeChoice.SELLER
+
 
 class Seller(CreatedBaseModel):
     user = OneToOneField('apps.User', CASCADE, related_name='seller')

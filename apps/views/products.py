@@ -41,8 +41,7 @@ class CityListAPIView(ListAPIView):
 
 @extend_schema(tags=['delivery point'])
 class DeliveryPointsListAPIView(ListAPIView):
-    queryset = DeliveryPoint.objects.only(
-        'address', 'has_dressing_room', 'location')
+    queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location')
     serializer_class = DeliveryPointsListModelSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["city"]
@@ -50,43 +49,25 @@ class DeliveryPointsListAPIView(ListAPIView):
 
 @extend_schema(tags=['delivery point'])
 class DeliveryPointsRetrieveAPIView(RetrieveAPIView):
-    queryset = DeliveryPoint.objects.only(
-        'address',
-        'has_dressing_room',
-        'location',
-        'order_retention_period')
+    queryset = DeliveryPoint.objects.only('address', 'has_dressing_room', 'location', 'order_retention_period')
     serializer_class = DeliveryPointsRetrieveModelSerializer
 
 
-@extend_schema(tags=['Product'])
+@extend_schema(tags=['Product'])  # ☑️
 class CategoryListAPIView(ListAPIView):
     queryset = Category.objects.defer('attribute', 'path', 'product_amount')
     serializer_class = CategoryModelSerializer
 
     def list(self, request, *args, **kwargs):
-        tree = cache.get('categories_key')
-        if tree is None:
+        data = cache.get('categories_key')
+        if data is None:
             queryset = self.filter_queryset(
                 self.get_queryset()).prefetch_related('subcategory')
             tree = get_cached_trees(queryset)
-            cache.set('categories_key', tree, 360)
-        serializer = self.get_serializer(tree, many=True)
-        return Response(serializer.data)
-
-
-# @extend_schema(tags=['Product'])
-# class ProductListAPIView(ListAPIView):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductListSerializer
-#     pagination_class = None
-#
-#     def get_queryset(self):
-#         query = super().get_queryset()
-#         slug = self.kwargs.get('slug')
-#         if "-" in slug:
-#             category_id = int(slug.split('-')[-1])
-#             return query.filter(category__path__contains=[category_id])
-#         return query
+            serializer = self.get_serializer(tree, many=True)
+            data = serializer.data
+            cache.set('categories_key', data, 36000)
+        return Response(data)
 
 
 @extend_schema(tags=["Product"])
@@ -98,14 +79,6 @@ class FavoriteProductListCreateAPIView(ListCreateAPIView):
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(user=self.request.user)
-
-    # def perform_create(self, serializer):
-    #     super().perform_create(serializer)
-
-    # def get_object(self):
-    #     qs = super().get_object()
-    #     obj = get_object_or_404(qs, pk=self.kwargs["pk"])
-    #     return obj
 
 
 # @extend_schema(tags=["Product"])
@@ -141,7 +114,7 @@ class ShopListCreateAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         query = super().get_queryset()
-        if self.request.user.type == User.TypeChoice.ADMIN:
+        if self.request.user.is_admin:
             return query
         return query.filter(seller__user=self.request.user)
 
@@ -152,19 +125,13 @@ class ShopListCreateAPIView(ListCreateAPIView):
 
 @extend_schema(tags=["Product"])
 class CommentListAPIView(ListAPIView):
-    queryset = Comment.objects.defer(
-        'is_anonymous',
-        'service_evaluation',
-        'delivery_speed_assessment',
-        'user',
-        'updated_at').prefetch_related('images')
+    queryset = Comment.objects.defer('is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'user',
+                                     'updated_at').prefetch_related('images')
     serializer_class = CommentListModelSerializer
 
     def get_queryset(self):
         query = super().get_queryset()
-        return query.filter(
-            product__slug=self.kwargs.get('slug'),
-            status=Comment.Status.PUBLISHED)
+        return query.filter(product__slug=self.kwargs.get('slug'), status=Comment.Status.PUBLISHED)
 
 
 @extend_schema(tags=["Product"])
@@ -177,7 +144,7 @@ class CommentCreateAPIView(CreateAPIView):
 class ProductModelViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
-    filter_backends = [DjangoFilterBackend,OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = ProductFiterSet
     ordering_fields = 'created_at',
     lookup_url_kwarg = 'slug'

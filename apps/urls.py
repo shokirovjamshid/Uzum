@@ -19,7 +19,7 @@ from apps.views import (
     QRCodeLoginAuthorizeView,
     QRCodeLoginStatusView, ChatHistoryListAPIView, UserChatRoomListAPIView,
 )
-from apps.views.chats import SellerChatRoomListAPIView
+from apps.views.chats import SellerChatRoomListAPIView, ImageUploadView
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -27,7 +27,7 @@ urlpatterns = [
     path('cities', CityListAPIView.as_view(), name='city_list_api'),
     path('delivery-points', DeliveryPointsListAPIView.as_view(), name='delivery_points_api'),
     path('delivery-points/<int:pk>', DeliveryPointsRetrieveAPIView.as_view(), name='delivery_point_api'),
-    path('categories', CategoryListAPIView.as_view(), name='category_list'),
+    path('categories', CategoryListAPIView.as_view(), name='category_list'), # ☑️
     path('register-sms-code/<str:phone>', RegisterSmsCodeAPIView.as_view(), name='register_sms_code'),
     path('register', RegisterAPIView.as_view(), name='register'),
 
@@ -38,8 +38,9 @@ urlpatterns = [
 
     # Chat REST API
     path("rooms/", UserChatRoomListAPIView.as_view(), name="chat_room_list"),
-    path("rooms/<int:pk>/historys", ChatHistoryListAPIView.as_view(), name="chat_history"),
+    path("rooms/<int:pk>/historys/", ChatHistoryListAPIView.as_view(), name="chat_history"),
     path("shops/<slug:slug>/rooms/", SellerChatRoomListAPIView.as_view(), name="seller_room_list"),
+    path('rooms/upload-image/', ImageUploadView.as_view(), name='upload_image'),
 
     # Products
     path("user/favorites/", FavoriteProductListCreateAPIView.as_view(), name="product_list"),

@@ -285,9 +285,7 @@ class CommentCreateModelSerializer(ModelSerializer):
     def validate(self, attrs):
         user = attrs.get('user')
         product = attrs.get('product')
-        if not OrderItem.objects.filter(
-                product=product,
-                order__user=user).exists():
+        if not OrderItem.objects.filter(product=product, order__user=user).exists():
             raise ValidationError('Siz kommit yoza olmaysiz')
         return super().validate(attrs)
 
@@ -298,11 +296,7 @@ class CommentCreateModelSerializer(ModelSerializer):
         user_name = 'Anonim'
         if not is_anonymous:
             user_name = user.first_name
-        comments = self.Meta.model.objects.create(
-            **validated_data, user_name=user_name)
-        comments_list = [
-            CommentImage(
-                comment=comments,
-                image=image) for image in images]
+        comments = self.Meta.model.objects.create(**validated_data, user_name=user_name)
+        comments_list = [CommentImage(comment=comments, image=image) for image in images]
         CommentImage.objects.bulk_create(comments_list)
         return comments
