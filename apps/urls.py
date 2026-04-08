@@ -20,6 +20,7 @@ from apps.views import (
     QRCodeLoginStatusView, ChatHistoryListAPIView, UserChatRoomListAPIView,
 )
 from apps.views.chats import SellerChatRoomListAPIView, ImageUploadView
+from apps.views.products import CategoryDetailAPIView
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -28,6 +29,7 @@ urlpatterns = [
     path('delivery-points', DeliveryPointsListAPIView.as_view(), name='delivery_points_api'),
     path('delivery-points/<int:pk>', DeliveryPointsRetrieveAPIView.as_view(), name='delivery_point_api'),
     path('categories', CategoryListAPIView.as_view(), name='category_list'), # ☑️
+    path('categoriesdetail', CategoryDetailAPIView.as_view(), name='category_list'), # ☑️
     path('register-sms-code/<str:phone>', RegisterSmsCodeAPIView.as_view(), name='register_sms_code'),
     path('register', RegisterAPIView.as_view(), name='register'),
 

@@ -9,7 +9,10 @@ class CustomUserManager(UserManager):
     def _create_user_object(self, phone, email, password, **extra_fields):
         if not phone:
             raise ValueError("The given phone must be set")
-        email = self.normalize_email(email)
+        if email:
+            email = self.normalize_email(email)
+        else:
+            email = None
         user = self.model(phone=phone, email=email, **extra_fields)
         user.password = make_password(password)
         return user

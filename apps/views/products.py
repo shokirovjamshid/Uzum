@@ -25,7 +25,7 @@ from apps.serializers import (
     CommentListModelSerializer,
     CommentCreateModelSerializer,
     FavoriteListProductModelSerializer,
-    FavoriteRetrieveProductSerializer,
+    FavoriteRetrieveProductSerializer, CategoryDetailModelSerializer,
 )
 
 signer = TimestampSigner()
@@ -69,6 +69,15 @@ class CategoryListAPIView(ListAPIView):
             cache.set('categories_key', data, 36000)
         return Response(data)
 
+@extend_schema(tags=['Product'])
+class CategoryDetailAPIView(ListAPIView):
+    queryset = Category.objects.filter(parent=None).prefetch_related(
+        'attribute__values',
+        'subcategory__attribute__values',
+        'subcategory__subcategory__attribute__values'
+    )
+    serializer_class = CategoryDetailModelSerializer
+
 
 @extend_schema(tags=["Product"])
 class FavoriteProductListCreateAPIView(ListCreateAPIView):
@@ -81,11 +90,7 @@ class FavoriteProductListCreateAPIView(ListCreateAPIView):
         return qs.filter(user=self.request.user)
 
 
-# @extend_schema(tags=["Product"])
-# class FavoriteDetailView(RetrieveAPIView):
-#     queryset = Favorite.objects.all()
-#     permission_classes = [IsAuthenticated, ]
-#     serializer_class = FavoriteDetailModelSerializer
+
 
 @extend_schema(tags=["Product"])
 class FavoriteProductRetrieveAPIView(RetrieveAPIView):

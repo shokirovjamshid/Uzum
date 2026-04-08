@@ -2,9 +2,8 @@ from django.db.models import Model, ForeignKey, CASCADE, DateTimeField, TextFiel
 
 
 class ChatRoom(Model):
-    buyer = ForeignKey("apps.User", CASCADE, related_name="customer_chats", limit_choices_to={'type': 'user'},
-                       db_index=True)
-    shop = ForeignKey('apps.Shop', CASCADE, related_name="shop_chats", db_index=True)
+    buyer = ForeignKey("apps.User", CASCADE, related_name="customer_chats", limit_choices_to={'type': 'user'})
+    shop = ForeignKey('apps.Shop', CASCADE, related_name="shop_chats")
     last_message_at = DateTimeField(auto_now=True)
     created_at = DateTimeField(auto_now_add=True)
 
@@ -23,9 +22,9 @@ class Message(Model):
     sender = ForeignKey("apps.User", CASCADE, related_name="sent_messages")
     text = TextField(null=True, blank=True)
     image = ImageField(null=True, blank=True, upload_to='chat/%Y/%m/%d')
-    is_read = BooleanField(default=False, db_index=True)
+    is_read = BooleanField(default=False)
     read_at = DateTimeField(null=True, blank=True)
-    created_at = DateTimeField(auto_now_add=True, db_index=True)
+    created_at = DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['created_at']

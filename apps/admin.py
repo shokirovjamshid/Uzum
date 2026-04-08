@@ -1,10 +1,11 @@
 from django.contrib import admin
+from django.contrib.admin.options import InlineModelAdmin
 from django.utils.translation import gettext_lazy as _
 from unfold.admin import ModelAdmin
 
 from apps.forms import CustomUserChangeForm, CustomUserCreationForm
-from apps.models import City, DaysWeek, User, Category, Shop, Seller
-from apps.models.products import Attribute, AttributeValue
+from apps.models import City, DaysWeek, User, Category, Shop, Seller, ProductModel
+from apps.models.products import Attribute, AttributeValue, ProductModelValue
 
 
 @admin.register(User)
@@ -63,30 +64,29 @@ class SellerAdmin(ModelAdmin):
     search_fields = 'name',
 
 
+class ModelCategoryValueInline(admin.StackedInline):
+    model = ProductModelValue
+
+
+# class ModelCategoryModelInline(InlineModelAdmin):
+#     model = ProductModel
+#     inlines = (ModelCategoryValueInline,)
+
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
     list_display = ('name',)
     search_fields = 'name',
+    # inlines = (ModelCategoryModelInline,)
 
-    # def get_queryset(self, request):
-    #     qs = super().get_queryset(request)
-    #     qs = qs.annotate(
-    #         _product_count = Count('products')
-    #     )
-    #     return qs
-    #
-    # def product_count(self,obj):
-    #     return obj._product_count
 
 class AttributeValueInline(admin.StackedInline):
     model = AttributeValue
+
 
 @admin.register(Attribute)
 class AttributeAdmin(admin.ModelAdmin):
     inlines = AttributeValueInline,
 
-
 # @admin.register()
 # class Admin(admin.ModelAdmin):
-    

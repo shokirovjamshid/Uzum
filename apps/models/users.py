@@ -22,7 +22,7 @@ class User(AbstractUser, ImageBaseModel):
         MALE = 1, 'Male'
         FEMALE = 0, 'Female'
 
-    email = EmailField(unique=True, null=True, blank=True)
+    email = EmailField(unique=True,null=True,blank=True)
     phone = CharField(max_length=12, validators=[uz_phone_validator], unique=True)
     password = CharField(max_length=128, null=True, blank=True)
     is_online = BooleanField(default=False)

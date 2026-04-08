@@ -71,6 +71,9 @@ class Product(CreatedBaseModel, SlugBaseModel):
     rating = FloatField(default=0)
     is_active = BooleanField(default=True)
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 class ProductVariant(Model):
     feature = JSONField()
@@ -82,6 +85,9 @@ class ProductVariant(Model):
     price_delta = PositiveBigIntegerField(null=True, blank=True)
     sku = CharField(max_length=7)
     attribute = JSONField()
+
+    def __str__(self):
+        return f"{self.product.name}"
 
 
 class ProductVariantAttribute(Model):
@@ -134,7 +140,15 @@ class Brand(Model):
 
 class ProductModel(Model):
     name = CharField(max_length=50)
+    category = ForeignKey('apps.Category', CASCADE, related_name='models')
+    def __str__(self):
+        return f"{self.name}"
 
+class ProductModelValue(Model):
+    product = ForeignKey('apps.ProductModel', CASCADE, related_name='values')
+    value = CharField(max_length=50, null=True, blank=True)
+    def __str__(self):
+        return f"{self.value}"
 
 class Comment(CreatedBaseModel):
     class Status(IntegerChoices):

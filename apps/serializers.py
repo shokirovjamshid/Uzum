@@ -11,6 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, Comment, \
     CommentImage, OrderItem, CartItem
 from apps.models.chats import Message, ChatRoom
+from apps.models.products import AttributeValue, Attribute
 from apps.models.utils import uz_phone_validator
 from apps.tasks import register_key
 from root.settings import r
@@ -195,11 +196,49 @@ class CategoryModelSerializer(ModelSerializer):
         model = Category
         fields = ['id', 'name', 'children', 'deeplink']
 
-    def get_children(self, obj):
+    def get_children(self, obj: Category):
         children = obj.get_children()
         if children:
             return CategoryModelSerializer(children, many=True).data
         return []
+
+
+class AttributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        fields = ['id', 'value']
+
+
+class AttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute
+        fields = ['id', 'name', ]
+
+    def to_representation(self, instance: Attribute):
+        repr = super().to_representation(instance)
+        attrs = instance.values.all()
+        repr['values'] = AttributeValueSerializer(attrs, many=True).data if attrs else []
+        return repr
+
+
+class CategoryDetailModelSerializer(Serializer):
+    children = SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'children', 'deeplink']
+
+    def get_children(self, obj: Category):
+        children = obj.get_children()
+        if children:
+            return CategoryModelSerializer(children, many=True).data
+        return []
+
+    def to_representation(self, instance: Category):
+        repr = super().to_representation(instance)
+        attrs = instance.attribute.all()
+        repr["attributes"] = AttributeSerializer(attrs, many=True).data if attrs else []
+        return repr
 
 
 class RegisterModelSerializer(ModelSerializer):

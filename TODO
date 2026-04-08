@@ -66,5 +66,8 @@ Task:
 24.product list ya'ni Arzonroq,qimmatroq, degan joyi
 25.pip install pytest-drf
 26.Uzum searchni bo'laklash ya'ni 4ta 4ta qilib olish
+27.Category ga API qilish kerak category tegishli bo'lgan attribute , attributevalueni fixtures ga yozish kerak.Category detail filter uchun
+qolgan modellarni fixturesni qo'shish
+28.Adminkani to'g'irlash __str__ qo'shish
 autoflake --in-place --remove-all-unused-imports --remove-unused-variables --ignore-init-module-imports --exclude="*migrations*" -r . && autopep8 --in-place --recursive --aggressive --aggressive --exclude="*migrations*" .
 SOLID,DRY,KISS
