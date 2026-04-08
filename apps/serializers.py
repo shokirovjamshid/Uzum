@@ -203,13 +203,13 @@ class CategoryModelSerializer(ModelSerializer):
         return []
 
 
-class AttributeValueSerializer(serializers.ModelSerializer):
+class AttributeValueSerializer(ModelSerializer):
     class Meta:
         model = AttributeValue
         fields = ['id', 'value']
 
 
-class AttributeSerializer(serializers.ModelSerializer):
+class AttributeSerializer(ModelSerializer):
     class Meta:
         model = Attribute
         fields = ['id', 'name', ]
@@ -221,7 +221,7 @@ class AttributeSerializer(serializers.ModelSerializer):
         return repr
 
 
-class CategoryDetailModelSerializer(Serializer):
+class CategoryDetailModelSerializer(ModelSerializer):
     children = SerializerMethodField()
 
     class Meta:
@@ -231,7 +231,7 @@ class CategoryDetailModelSerializer(Serializer):
     def get_children(self, obj: Category):
         children = obj.get_children()
         if children:
-            return CategoryModelSerializer(children, many=True).data
+            return CategoryDetailModelSerializer(children, many=True).data
         return []
 
     def to_representation(self, instance: Category):
