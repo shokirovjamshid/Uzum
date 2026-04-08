@@ -2,16 +2,23 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-from django.templatetags.static import static
-from django.urls import reverse_lazy
-from dotenv import load_dotenv
+import redis
 
-load_dotenv('.env')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+
+def is_docker():
+    return Path("/.dockerenv").exists()
+
+
+if not is_docker():
+    from dotenv import load_dotenv
+
+    load_dotenv('.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -31,8 +38,10 @@ INSTALLED_APPS = [
     "unfold.contrib.inlines",  # optional, if special inlines are needed
     "unfold.contrib.import_export",  # optional, if django-import-export package is used
     "unfold.contrib.guardian",  # optional, if django-guardian package is used
-    "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
-    "unfold.contrib.location_field",  # optional, if django-location-field package is used
+    # optional, if django-simple-history package is used
+    "unfold.contrib.simple_history",
+    # optional, if django-location-field package is used
+    "unfold.contrib.location_field",
     "unfold.contrib.constance",  # optional, if django-constance package is used
     'django.contrib.postgres',
     'django.contrib.admin',
@@ -48,7 +57,7 @@ INSTALLED_APPS = [
     'channels',
     'rest_framework',
     # online apps
-    'django_jsonform',
+    "django_jsonform",
     'drf_spectacular',
     'rest_framework_simplejwt',
     'django_celery_beat',
@@ -56,7 +65,6 @@ INSTALLED_APPS = [
     'django_filters',
     # 'django_elasticsearch_dsl',
     # 'django_elasticsearch_dsl_drf',
-
 
 ]
 
@@ -82,7 +90,7 @@ ROOT_URLCONF = 'root.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -96,7 +104,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'root.wsgi.application'
 ASGI_APPLICATION = 'root.asgi.application'
-
+AUTH_USER_MODEL = 'apps.User'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -149,10 +157,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
 
 CELERY_BROKER_URL = REDIS_URL
-
+r = redis.Redis.from_url(REDIS_URL, decode_responses=True)
+TIME_OUT = 300
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
@@ -184,6 +193,7 @@ SPECTACULAR_SETTINGS = {
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -191,11 +201,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=240),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=240),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1000),
 }
 
-# eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9.eyJhaWQiOjAsImNhcCI6MCwiaWF0IjoxLjc3MDgzNjY2MTg3OTEwMDkzNWU5LCJpc3MiOiJzdWJuZXRAbWluLmlvIiwibGlkIjoiN2UzZTNiMTEtNjJkNi00ZDhkLWEzY2EtZWE1M2U0OTRjNjNmIiwib3JnIjoiIiwicGxhbiI6IkZSRUUiLCJzdWIiOiJzaG9raXJvdmphbXNoaWQ1NTVAZ21haWwuY29tIiwidHJpYWwiOmZhbHNlfQ.tOLST1cUsH0b8eUoAy86U_T3GlJ93gUCkEyyyPB0OUBhMI8Agp8lccD8khaFbaVh1vZmdWpbY7-ltxZGXCLc10tNNkLqmMgWgsJ8DC0hPNU2WpI0VHfUlfi_PW75Ogxu
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -204,8 +213,17 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
-ES_INDEX = os.getenv("ELASTICSEARCH_PRODUCT_INDEX", "products")
+# settings.py
+
+DEFAULT_FILE_STORAGE = STORAGES.get("default", {}).get(
+    "BACKEND", "django.core.files.storage.FileSystemStorage"
+)
+
+STATICFILES_STORAGE = STORAGES.get("staticfiles", {}).get(
+    "BACKEND", "django.contrib.staticfiles.storage.StaticFilesStorage"
+)
+# ES_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
+# ES_INDEX = os.getenv("ELASTICSEARCH_PRODUCT_INDEX", "products")
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
@@ -213,8 +231,6 @@ AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = True
 AWS_S3_FILE_OVERWRITE = False
-
-AUTH_USER_MODEL = 'apps.User'
 
 UNFOLD = {
     "SITE_TITLE": "Uzum Admin Dashboard",
@@ -226,4 +242,31 @@ UNFOLD = {
         "show_all_applications": True,
     }
 }
+# LOGGING = {
+#     'version': 1,
+#     'filters': {
+#         'require_debug_true': {
+#             '()': 'django.utils.log.RequireDebugTrue',
+#         }
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'filters': ['require_debug_true'],
+#             'class': 'logging.StreamHandler',
+#         }
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'level': 'DEBUG',
+#             'handlers': ['console'],
+#         }
+#     }
+# }
 
+
+# seller # eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzk1OTM3MTI2LCJpYXQiOjE3NzUyMDExMjYsImp0aSI6IjJkZGZiNzc2ZjZlMjRjZGM5Nzk1ZGY4YmEzYTNlYzNhIiwidXNlcl9pZCI6IjMifQ.HMV1G8PdTWZKfNQzkhaKJ75c7_Pj039zGDBFiCx4T5I
+
+# user1  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzk1OTM3MjQ3LCJpYXQiOjE3NzUyMDEyNDcsImp0aSI6IjdmYmE2ODgxY2M0ZjRjNGI5MmJiOTc2NWZmOGM3ODg5IiwidXNlcl9pZCI6IjEifQ.dNSoRpvF2UeEDTPZKnZVgjjDagDRbpf0dI8VuOb2dMs
+
+# user2  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzk1OTM3MzU3LCJpYXQiOjE3NzUyMDEzNTcsImp0aSI6ImRkMTFhNjM1ZGFhYTRmMWZhMzU0OWY4ZjU0MWE4NWYzIiwidXNlcl9pZCI6IjQifQ.QANf8AUpvF4w6fYjeQfavqFXuYp2zFymTblbtMHKgr8

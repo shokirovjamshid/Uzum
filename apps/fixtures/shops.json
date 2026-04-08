@@ -1,0 +1,19 @@
+[
+  {
+    "model": "apps.shop",
+    "pk": 1,
+    "fields": {
+      "slug": "apple-texnikalari",
+      "created_at": "2026-03-06T12:45:29.747Z",
+      "updated_at": "2026-03-06T12:45:29.747Z",
+      "image": "",
+      "name": "Apple texnikalar",
+      "seller": 1,
+      "description": "Zo'r texnikalar",
+      "banner": "seller/banner/2026/03/06/photo_2025-12-31_11-34-11.jpg",
+      "rating": 0.0,
+      "comment_count": 0,
+      "order_count": 0
+    }
+  }
+]

@@ -12,28 +12,6 @@ register yoki login qiligandan keyin qayerga otib yuborishi
 chat qo'shish kerak user bilan seller o'rtasida
 Higt load(ddos attack,balance)
 
-smartfon-wo-x-16-8128-gb
-Smartfon W&O X 16 8/128 GB
-
-smartfon-infinix-hot
-Smartfon Infinix HOT
-
-smartfon-xiaomi-redmi
-Smartfon Xiaomi Redmi
-
-Smartfon Xiaomi Redmi Note 15 Pro 5G, 12+512 GB, 200 MP, 6.83″ 1.5K AMOLED, 6580 mAh.
-
-Smartfon HTC E5 4+4/64 GB, 6.745
-smartfon-htc-e5-4464-gb-6745
-
-Seller model:
-Register:
-Ism
-phone_number
-Email
-Status Yatt,yoki Yuridik
-parol
-
 Login:
 phone_nuber yoki email
 parol
@@ -67,12 +45,6 @@ Task:
 2.Savol va javoblar ✅
 3.Ko'ptillik
 4.Hamma tovarlarni ko'rish ko'rish
-5.Selenium orqali uzumni katalogini ko'chiramiz
-
-
-
-
-
 5.Selenium orqali uzumni katalogini ko'chiramiz ✅
 6.Elasticsearch qo'shish alohida texnalogiya
 7.Argon database
@@ -80,9 +52,22 @@ Task:
 9.Input JS ✅
 10.Querysetni to'g'irlash ya'ni (User.admins.all())desak faqat adminlarni yoki (User.users.all()) desak userlarni olib kelishi kerak ✅
 12.Faqat sellerda balance bor
-13.CategoryImage qo'shish kerak
 14.Ishlab chiqirlgan mamalakat ✅
 15.User modelni bo'lish ✅
 16.Postgres ni bo'lish (pgpool) bilan high load uchun
 17.Meta base dashboard uchun caddy
-get_ttl
+18.SEO(Search Engine Optimization)
+18.Categories,favorite,products ni ichiga birlashtirib yuborish kerak ✅
+19.Favorite uchun API ✅
+20.Shop uchun API har bir user uchun ya'ni admin uchun hamma shoplarni ko'rish,seller uchun o'zinikini,user uchun faqat bitta ✅
+21.Flask8 ,isort
+22.docker ignoreni to'g'irlash ✅
+23.get_ttl ya'ni sms ko'dni qolgan vaqtini ko'rish
+24.product list ya'ni Arzonroq,qimmatroq, degan joyi
+25.pip install pytest-drf
+26.Uzum searchni bo'laklash ya'ni 4ta 4ta qilib olish
+27.Category ga API qilish kerak category tegishli bo'lgan attribute , attributevalueni fixtures ga yozish kerak.Category detail filter uchun
+qolgan modellarni fixturesni qo'shish
+28.Adminkani to'g'irlash __str__ qo'shish
+autoflake --in-place --remove-all-unused-imports --remove-unused-variables --ignore-init-module-imports --exclude="*migrations*" -r . && autopep8 --in-place --recursive --aggressive --aggressive --exclude="*migrations*" .
+SOLID,DRY,KISS

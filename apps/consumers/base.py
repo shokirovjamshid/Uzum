@@ -1,6 +1,7 @@
 import ujson
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
+from apps.models import User
 from apps.models.chats import Message
 from apps.models.users import User
 
@@ -16,10 +17,21 @@ class CustomAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
         return ujson.dumps(content)
 
     async def save_msg(self, **data):
-        await Message.objects.acreate(**data)
+        return await Message.objects.acreate(**data)
 
     async def get_user(self, user_id):
         try:
             return await User.objects.aget(id=user_id)
         except User.DoesNotExist:
             return None
+
+    async def update_is_online(self, is_online=True):
+        if self.user.is_user:
+            self.user.is_online = is_online
+            await self.user.asave(update_fields=['is_online'])
+        elif self.user.is_seller:
+            self.shop.is_online = is_online
+            await self.shop.asave(update_fields=['is_online'])
+
+    async def send_json(self, close=False, **content):
+        return await super().send_json(content, close=close)

@@ -1,0 +1,98 @@
+[
+  {
+    "model": "apps.user",
+    "pk": 1,
+    "fields": {
+      "last_login": "2026-03-12T10:15:21.131Z",
+      "is_superuser": true,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-03-06T11:42:35.962Z",
+      "image": "",
+      "email": "",
+      "phone": "904461557",
+      "password": "argon2$argon2id$v=19$m=102400,t=2,p=8$MVY2d2ZvWWc1Z1JqdFQ4eGVVSkhXVw$VqNbion2XSQ60gl3xgZYxjKgL9DgHFsWYLq88Sp39uc",
+      "is_online": false,
+      "patronymic": null,
+      "type": "admin",
+      "gender": null,
+      "birth_date": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "apps.user",
+    "pk": 3,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "Shokirov",
+      "last_name": "Jamshid",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-03-06T12:43:18Z",
+      "image": "",
+      "email": "shokirovjamshid555@gmail.com",
+      "phone": "979589669",
+      "password": null,
+      "is_online": false,
+      "patronymic": null,
+      "type": "seller",
+      "gender": null,
+      "birth_date": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "apps.user",
+    "pk": 4,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-03-06T12:59:30.681Z",
+      "image": "",
+      "email": null,
+      "phone": "979589668",
+      "password": null,
+      "is_online": false,
+      "patronymic": null,
+      "type": "user",
+      "gender": null,
+      "birth_date": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "apps.user",
+    "pk": 5,
+    "fields": {
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-04-01T07:43:12.576Z",
+      "image": "",
+      "email": null,
+      "phone": "901234567",
+      "password": null,
+      "is_online": false,
+      "patronymic": null,
+      "type": "user",
+      "gender": null,
+      "birth_date": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

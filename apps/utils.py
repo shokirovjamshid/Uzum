@@ -4,6 +4,7 @@ import io
 
 from qrcode import QRCode
 
+
 def _generate_qr_image_base64(payload: str) -> str:
     qr = QRCode(version=1, box_size=10, border=5)
     qr.add_data(payload)
