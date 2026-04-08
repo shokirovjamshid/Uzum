@@ -69,6 +69,7 @@ class CategoryListAPIView(ListAPIView):
             cache.set('categories_key', data, 36000)
         return Response(data)
 
+
 @extend_schema(tags=['Product'])
 class CategoryDetailAPIView(ListAPIView):
     queryset = Category.objects.filter(parent=None).prefetch_related(
@@ -77,6 +78,17 @@ class CategoryDetailAPIView(ListAPIView):
         'subcategory__subcategory__attribute__values'
     )
     serializer_class = CategoryDetailModelSerializer
+
+    def list(self, request, *args, **kwargs):
+        data = cache.get('categories_key')
+        if data is None:
+            queryset = self.filter_queryset(
+                self.get_queryset()).prefetch_related('subcategory')
+            tree = get_cached_trees(queryset)
+            serializer = self.get_serializer(tree, many=True)
+            data = serializer.data
+            cache.set('categories_key', data, 36000)
+        return Response(data)
 
 
 @extend_schema(tags=["Product"])
@@ -88,8 +100,6 @@ class FavoriteProductListCreateAPIView(ListCreateAPIView):
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(user=self.request.user)
-
-
 
 
 @extend_schema(tags=["Product"])
