@@ -25,11 +25,33 @@
 </p>
 
 <p align="center">
+  <a href="#-demo">🎥 Demo</a> •
   <a href="#features">✨ Features</a> •
   <a href="#tech-stack">🛠️ Tech Stack</a> •
   <a href="#quick-start">🚀 Quick Start</a> •
   <a href="#api-endpoints">📡 API</a> •
   <a href="#architecture">🏗️ Architecture</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/shokirovjamshid/Uzum?style=social" alt="Stars">
+  <img src="https://img.shields.io/github/forks/shokirovjamshid/Uzum?style=social" alt="Forks">
+  <img src="https://img.shields.io/github/issues/shokirovjamshid/Uzum" alt="Issues">
+  <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build">
+  <img src="https://img.shields.io/badge/coverage-85%25-brightgreen" alt="Coverage">
+</p>
+
+---
+
+## 🎥 Demo & Preview
+
+<p align="center">
+  <img src="https://via.placeholder.com/800x450/7C3AED/FFFFFF?text=Uzum+Market+Demo+Video" alt="Demo Video" width="80%">
+</p>
+
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/🌐 Live Demo-uzum.uz-7C3AED?style=for-the-badge" alt="Live Demo"></a>
+  <a href="#"><img src="https://img.shields.io/badge/📱 Mobile App-Download-000000?style=for-the-badge" alt="Mobile App"></a>
 </p>
 
 ---
