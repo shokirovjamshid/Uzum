@@ -1,8 +1,40 @@
-# Uzum Market - Full-Stack E-commerce Platform
+<p align="center">
+  <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png" width="80" height="80" alt="Python">
+  <img src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/react/react.png" width="80" height="80" alt="React">
+</p>
 
-Uzum Market is a comprehensive e-commerce marketplace platform inspired by uzum.uz. It includes a Django REST API backend and a React TypeScript frontend.
+<h1 align="center">🛒 Uzum Market</h1>
 
-## Features
+<p align="center">
+  <b>Full-Stack E-commerce Marketplace Platform</b><br>
+  <i>Inspired by uzum.uz - Modern, scalable, feature-rich</i>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Django-6.0%2B-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.0%2B-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Python-3.13%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind">
+</p>
+
+<p align="center">
+  <a href="#features">✨ Features</a> •
+  <a href="#tech-stack">🛠️ Tech Stack</a> •
+  <a href="#quick-start">🚀 Quick Start</a> •
+  <a href="#api-endpoints">📡 API</a> •
+  <a href="#architecture">🏗️ Architecture</a>
+</p>
+
+---
+
+## ✨ Features
 
 ### Core E-commerce Features
 - **Product Catalog** - Browse products with infinite scroll, categories, and search
@@ -37,32 +69,50 @@ Uzum Market is a comprehensive e-commerce marketplace platform inspired by uzum.
 - **CDN Ready** - Static and media files served via S3-compatible storage
 - **WebSocket Scaling** - Redis channel layer for real-time features
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Backend
-- Django 6.0+
-- Django REST Framework
-- Django Channels (WebSocket)
-- PostgreSQL
-- Redis (Caching, Channels layer, Celery broker)
-- Celery (Background tasks)
-- JWT Authentication
+<p>
+  <img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/DRF-092E20?style=for-the-badge&logo=django&logoColor=white" alt="DRF">
+  <img src="https://img.shields.io/badge/Channels-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Channels">
+  <img src="https://img.shields.io/badge/Celery-378F42?style=for-the-badge&logo=celery&logoColor=white" alt="Celery">
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white" alt="JWT">
+</p>
+
+- **Django 6.0+** - High-level Python web framework
+- **Django REST Framework** - Powerful API toolkit
+- **Django Channels** - WebSocket support for real-time features
+- **PostgreSQL** - Robust relational database
+- **Redis** - Caching, Channels layer, Celery broker
+- **Celery** - Distributed task queue for background jobs
+- **JWT Authentication** - Secure token-based auth
 
 ### Frontend
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- Zustand (State management)
-- TanStack Query (Data fetching, caching, infinite scroll)
-- React Router (URL-based filter state)
-- Lucide React (Icons)
-- React Hot Toast (Notifications)
+<p>
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind">
+  <img src="https://img.shields.io/badge/Zustand-433E38?style=for-the-badge&logo=zustand&logoColor=white" alt="Zustand">
+</p>
 
-### Libraries for Dynamic Filtering
-- **Query String** - URL state management for filters
-- **Range Slider** - Custom dual-handle price range component
-- **Intersection Observer** - Infinite scroll with cursor-based pagination
+- **React 18** - Modern UI library with concurrent features
+- **TypeScript** - Type-safe JavaScript
+- **Vite** - Lightning-fast build tool
+- **Tailwind CSS** - Utility-first CSS framework
+- **Zustand** - Lightweight state management
+- **TanStack Query** - Powerful data fetching and caching
+- **React Router** - Declarative routing
+- **Lucide React** - Beautiful icons
+
+### Infrastructure
+<p>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+  <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white" alt="Nginx">
+</p>
 
 ## Quick Start
 
