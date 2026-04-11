@@ -66,4 +66,4 @@ class SellerChatRoomListAPIView(ListAPIView):
     def get_queryset(self):
         queryset = super().get_queryset()
         shop_slug = self.kwargs['slug']
-        return queryset.filter(shop_slug=shop_slug)
+        return queryset.filter(shop__slug=shop_slug)

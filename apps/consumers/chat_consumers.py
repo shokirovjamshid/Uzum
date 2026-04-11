@@ -19,10 +19,6 @@ class ChatConsumer(CustomAsyncJsonWebsocketConsumer):
             await self.close()
             return
 
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
-        await self.accept()
-        await self.update_is_online()
-
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
         await self.update_is_online(False)

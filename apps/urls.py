@@ -19,6 +19,7 @@ from apps.views import (
     QRCodeLoginAuthorizeView,
     QRCodeLoginStatusView, ChatHistoryListAPIView, UserChatRoomListAPIView,
 )
+from apps.views.auths import UserUpdateAPIView, UserDetailAPIView
 from apps.views.chats import SellerChatRoomListAPIView, ImageUploadView
 from apps.views.products import CategoryDetailAPIView
 
@@ -28,10 +29,10 @@ urlpatterns = [
     path('cities', CityListAPIView.as_view(), name='city_list_api'),
     path('delivery-points', DeliveryPointsListAPIView.as_view(), name='delivery_points_api'),
     path('delivery-points/<int:pk>', DeliveryPointsRetrieveAPIView.as_view(), name='delivery_point_api'),
-    path('categories', CategoryListAPIView.as_view(), name='category_list'), # ☑️
-    path('categoriesdetail', CategoryDetailAPIView.as_view(), name='category_list'), # ☑️
     path('register-sms-code/<str:phone>', RegisterSmsCodeAPIView.as_view(), name='register_sms_code'),
     path('register', RegisterAPIView.as_view(), name='register'),
+    path('user/update/<int:pk>/', UserUpdateAPIView.as_view(), name='update_user'),
+    path('user/me/', UserDetailAPIView.as_view(), name='user_detail'),
 
     # QR-code auth
     path("auth/qr/request/", QRCodeLoginRequestView.as_view(), name="qr_login_request"),
@@ -46,9 +47,11 @@ urlpatterns = [
 
     # Products
     path("user/favorites/", FavoriteProductListCreateAPIView.as_view(), name="product_list"),
-    path('user/favorite/<int:pk>', FavoriteProductRetrieveAPIView.as_view(), name='product_detail'),
+    path('user/favorite/<slug:slug>', FavoriteProductRetrieveAPIView.as_view(), name='favorite_product_detail'),
     path('shops/<slug:slug>', ShopRetrieveUpdateDestroyAPIView.as_view(), name='shop_profile'),
     path('shops', ShopListCreateAPIView.as_view(), name='shop_list_and_create_apies'),
+    path('categories', CategoryListAPIView.as_view(), name='category_list'),  # ☑️
+    path('categoriesdetail', CategoryDetailAPIView.as_view(), name='category_detail_list'),  # ☑️
 ]
 
 router = DefaultRouter()

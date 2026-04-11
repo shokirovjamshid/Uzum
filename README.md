@@ -1,0 +1,368 @@
+# Uzum Market - Full-Stack E-commerce Platform
+
+Uzum Market is a comprehensive e-commerce marketplace platform inspired by uzum.uz. It includes a Django REST API backend and a React TypeScript frontend.
+
+## Features
+
+### Core E-commerce Features
+- **Product Catalog** - Browse products with infinite scroll, categories, and search
+- **Product Details** - Rich product pages with images, variants, ratings, and reviews
+- **Shopping Cart** - Full cart functionality with quantity management and persistent storage
+- **Favorites** - Save favorite products with quick add-to-cart functionality
+- **User Authentication** - JWT-based auth with phone/SMS verification and QR login
+- **Real-time Chat** - WebSocket-powered chat between customers and sellers
+
+### Advanced Features
+
+#### Dynamic Product Filtering & Search
+- **Multi-faceted Filtering** - Filter products by category, price range, brand, ratings, and custom attributes
+- **Dynamic Filter Generation** - Filters automatically generated based on category attributes (color, size, material, etc.)
+- **Real-time Filter Updates** - Filter counts update dynamically as selections change
+- **URL-based Filter State** - Filter selections persist in URL for shareable filtered views
+- **Price Range Slider** - Interactive dual-handle slider for precise price filtering
+- **Sort & Pagination** - Multiple sorting options (price, popularity, rating, newest) with cursor-based pagination
+- **Smart Search** - Full-text search with suggestions, history, and typo tolerance
+- **Category-specific Filters** - Dynamic attribute filters tailored to each category (e.g., RAM/Storage for electronics, Size for clothing)
+
+### User Experience
+- **Responsive Design** - Fully responsive UI optimized for mobile, tablet, and desktop
+- **Toast Notifications** - Non-intrusive feedback for user actions
+- **Skeleton Loading** - Smooth loading states for better perceived performance
+- **Image Optimization** - Lazy loading and responsive images
+- **Offline Support** - Cart and favorites persist in localStorage
+
+### Performance & Scalability
+- **Redis Caching** - Multi-layer caching for categories, products, and user data
+- **Database Optimization** - Query optimization with select_related/prefetch_related
+- **CDN Ready** - Static and media files served via S3-compatible storage
+- **WebSocket Scaling** - Redis channel layer for real-time features
+
+## Tech Stack
+
+### Backend
+- Django 6.0+
+- Django REST Framework
+- Django Channels (WebSocket)
+- PostgreSQL
+- Redis (Caching, Channels layer, Celery broker)
+- Celery (Background tasks)
+- JWT Authentication
+
+### Frontend
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Zustand (State management)
+- TanStack Query (Data fetching, caching, infinite scroll)
+- React Router (URL-based filter state)
+- Lucide React (Icons)
+- React Hot Toast (Notifications)
+
+### Libraries for Dynamic Filtering
+- **Query String** - URL state management for filters
+- **Range Slider** - Custom dual-handle price range component
+- **Intersection Observer** - Infinite scroll with cursor-based pagination
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.13+
+- Node.js 18+
+- PostgreSQL
+- Redis
+- Docker (optional)
+
+### Backend Setup
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd uzum
+```
+
+2. Create and activate virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install dependencies:
+```bash
+pip install uv
+uv pip install -e .
+```
+
+4. Create `.env` file:
+```env
+SECRET_KEY=your-secret-key
+DEBUG=True
+POSTGRES_NAME=uzum
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+REDIS_HOST=localhost
+REDIS_PORT=6379
+AWS_ACCESS_KEY_ID=your-key
+AWS_SECRET_ACCESS_KEY=your-secret
+AWS_STORAGE_BUCKET_NAME=your-bucket
+AWS_S3_ENDPOINT_URL=your-endpoint
+```
+
+5. Run migrations:
+```bash
+cd /home/dev/PycharmProjects/uzum 
+python manage.py migrate
+```
+
+6. Create superuser:
+```bash
+python manage.py createsuperuser
+```
+
+7. Run the server:
+```bash
+python manage.py runserver
+```
+
+Backend API will be available at `http://localhost:8000`
+Swagger UI at `http://localhost:8000/`
+
+### Frontend Setup
+
+1. Navigate to frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create environment file:
+```bash
+cp .env.example .env
+```
+
+4. Start development server:
+```bash
+npm run dev
+```
+
+Frontend will be available at `http://localhost:3000`
+
+### Docker Setup (Alternative)
+
+1. Build and run with Docker Compose:
+```bash
+docker-compose up --build
+```
+
+This will start:
+- PostgreSQL database
+- Redis server
+- Django backend
+- Frontend development server
+
+## API Endpoints
+
+### Authentication
+- `POST /api/v1/register` - Login with phone and SMS code
+- `GET /api/v1/register-sms-code/<phone>` - Request SMS code
+- `POST /api/v1/token/` - Get JWT tokens
+- `POST /api/v1/token/refresh/` - Refresh access token
+- `POST /api/v1/auth/qr/request/` - Request QR login
+- `POST /api/v1/auth/qr/authorize/` - Authorize QR login
+
+### Products & Dynamic Filtering
+- `GET /api/v1/products` - List products with advanced filtering
+  - Query params: `?category=<slug>&min_price=1000&max_price=50000&brand=apple,samsung&sort=price_asc&page=1`
+  - Filter by: category, price range, brand, rating, attributes (color, size, etc.)
+  - Sort options: `price_asc`, `price_desc`, `rating`, `newest`, `popular`
+- `GET /api/v1/products/filters` - Get available filters for category
+  - Returns dynamic filter options: price range, brands, attributes with counts
+- `GET /api/v1/products/<slug>` - Product detail
+- `GET /api/v1/products/<slug>/comments` - Product comments
+- `POST /api/v1/products/<slug>/comments` - Add comment
+
+### Categories
+- `GET /api/v1/categories` - List categories
+- `GET /api/v1/categoriesdetail` - Categories with attributes
+
+### User
+- `GET /api/v1/user/favorites` - List favorites
+- `POST /api/v1/user/favorites` - Add/remove favorite
+- `GET /api/v1/rooms` - Chat rooms
+- `GET /api/v1/rooms/<id>/historys` - Chat history
+
+### Shops
+- `GET /api/v1/shops` - List shops
+- `GET /api/v1/shops/<slug>` - Shop detail
+
+## Project Structure
+
+```
+uzum/
+├── apps/                      # Django applications
+│   ├── models/               # Database models
+│   ├── views/                # API views
+│   ├── serializers.py        # DRF serializers
+│   ├── urls.py               # URL configuration
+│   └── consumers/            # WebSocket consumers
+├── root/                     # Django project settings
+│   ├── settings.py
+│   ├── urls.py
+│   └── asgi.py
+├── frontend/                 # React frontend
+│   ├── src/
+│   │   ├── components/       # React components
+│   │   ├── pages/          # Page components
+│   │   ├── hooks/          # Custom hooks
+│   │   ├── stores/         # Zustand stores
+│   │   └── services/       # API services
+│   ├── public/             # Static assets
+│   └── package.json
+├── docker-compose.yaml       # Docker configuration
+├── pyproject.toml           # Python dependencies
+└── README.md
+```
+
+## Development
+
+### Running Tests
+
+Backend:
+```bash
+python manage.py test
+```
+
+Frontend:
+```bash
+cd frontend
+npm run test
+```
+
+### Code Style
+
+Backend uses:
+- Black (formatter)
+- isort (import sorting)
+- flake8 (linting)
+
+Frontend uses:
+- ESLint
+- Prettier
+
+## Deployment
+
+### Production Checklist
+
+1. Set `DEBUG=False` in settings
+2. Use strong `SECRET_KEY`
+3. Configure proper database credentials
+4. Set up S3 or other media storage
+5. Configure CORS for your domain
+6. Use HTTPS
+7. Set up proper logging
+
+### Docker Production
+
+```bash
+docker-compose -f docker-compose.prod.yaml up -d
+```
+
+## Dynamic Filter Architecture
+
+### Overview
+The platform implements a sophisticated **multi-faceted dynamic filtering system** similar to modern e-commerce platforms like Amazon or Uzum.
+
+### Backend Implementation
+
+#### Database Schema
+```
+Category
+├── attribute_value: ManyToManyField (color, size, material, etc.)
+└── subcategories: TreeForeignKey (nested categories)
+
+Product
+├── category: ForeignKey
+├── price: DecimalField
+├── rating: FloatField
+└── variants: JSONField (for multiple configurations)
+
+AttributeValue
+├── attribute: ForeignKey (Attribute type)
+└── value: CharField (e.g., "Red", "128GB")
+```
+
+#### Filter API Flow
+1. **Category Selection** → System identifies available attributes for that category
+2. **Filter Discovery** → `/api/v1/products/filters` returns:
+   - Price range (min/max from products in category)
+   - Available brands with product counts
+   - Dynamic attributes with value counts (e.g., Colors: Red(5), Blue(3))
+3. **Product Querying** → `/api/v1/products` applies selected filters using efficient SQL queries with `select_related` and `prefetch_related`
+4. **Result Aggregation** → Filter counts update based on current selection (faceted search)
+
+#### Key Backend Features
+- **Dynamic SQL Generation** - Filters built based on category attributes
+- **Query Optimization** - Uses PostgreSQL indexes and Django ORM optimization
+- **Caching Layer** - Redis caches filter metadata for popular categories
+- **Cursor Pagination** - Efficient pagination for large product sets
+
+### Frontend Implementation
+
+#### Filter State Management
+```typescript
+// URL-based state (shareable filters)
+// ?category=electronics&price_min=1000&price_max=50000&color=red,blue&sort=price_asc
+
+// Zustand store manages active filters
+interface FilterState {
+  category: string | null;
+  priceRange: [number, number];
+  attributes: Record<string, string[]>; // { color: ['red', 'blue'] }
+  sort: 'price_asc' | 'price_desc' | 'rating' | 'newest';
+}
+```
+
+#### UI Components
+- **Filter Sidebar** - Collapsible panel with dynamic filter sections
+- **Price Range Slider** - Dual-handle slider with real-time updates
+- **Attribute Checkboxes** - Grouped by attribute type (color swatches, size buttons)
+- **Active Filter Chips** - Removable tags showing current selections
+- **Sort Dropdown** - Combined sort and view options
+- **Results Counter** - Live update of matching products count
+
+#### Key Frontend Features
+- **URL Synchronization** - Filter changes reflect in URL (back button support)
+- **Optimistic Updates** - UI updates immediately while API fetches
+- **Infinite Scroll** - Cursor-based pagination for smooth browsing
+- **Mobile Filter Sheet** - Bottom sheet for mobile filter experience
+- **Filter Persistence** - Saved to localStorage for returning users
+
+### Performance Optimizations
+- **Debounced API Calls** - 300ms delay on slider interactions
+- **Request Deduplication** - TanStack Query cancels in-flight requests
+- **Prefetching** - Next page of results fetched in background
+- **Virtual Scrolling** - For large filter lists (100+ brands)
+- **Memoization** - React.memo for filter components to prevent unnecessary renders
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+MIT License
+
+## Support
+
+For support, email support@uzum.uz or join our Telegram channel.

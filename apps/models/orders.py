@@ -11,8 +11,6 @@ from apps.models.utils import uz_phone_validator
 class Cart(Model):
     user = OneToOneField('apps.User', CASCADE, related_name='cart')
 
-    # class Meta:
-    #     unique_together = ('user', 'product')
 
 class CartItem(CreatedBaseModel):
     product = ForeignKey('apps.Product', SET_NULL, null=True)

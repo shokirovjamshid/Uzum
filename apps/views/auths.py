@@ -5,7 +5,7 @@ from django.core.signing import TimestampSigner, SignatureExpired, BadSignature
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,7 +16,7 @@ from apps.serializers import (
     QRLoginStatusResponseSerializer,
     QRLoginRequestResponseSerializer,
     QRLoginAuthorizeRequestSerializer,
-    RegisterModelSerializer,
+    RegisterModelSerializer, UserUpdateModelSerializer,
 )
 from apps.tasks import register_sms, register_key
 from apps.utils import _generate_qr_image_base64
@@ -45,6 +45,26 @@ class RegisterSmsCodeAPIView(APIView):
 class RegisterAPIView(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterModelSerializer
+
+
+@extend_schema(tags=['Auth'])
+class UserDetailAPIView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateModelSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+@extend_schema(tags=['Auth'])
+class UserUpdateAPIView(UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateModelSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 
 @extend_schema(tags=["Auth"])

@@ -20,7 +20,7 @@ class Category(MPTTModel, ImageBaseModel):
     slug = SlugField(max_length=255, unique=True, editable=False)
     deeplink = URLField(null=True, blank=True)
     product_amount = PositiveIntegerField(default=0, editable=False)
-    attribute = ManyToManyField("apps.Attribute", blank=True)
+    attribute_value = ManyToManyField("apps.AttributeValue", blank=True)
     path = ArrayField(PositiveIntegerField(), default=list, editable=False)
 
     def save(self, *args, **kwargs):
@@ -84,7 +84,6 @@ class ProductVariant(Model):
     color = ForeignKey('apps.ColorProduct', SET_NULL, null=True, blank=True)
     price_delta = PositiveBigIntegerField(null=True, blank=True)
     sku = CharField(max_length=7)
-    attribute = JSONField()
 
     def __str__(self):
         return f"{self.product.name}"

@@ -3,13 +3,13 @@ from datetime import timedelta
 from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import CharField, ChoiceField, SerializerMethodField, IntegerField, HiddenField, \
-    CurrentUserDefault
+from rest_framework.fields import CharField, ChoiceField, IntegerField, HiddenField, CurrentUserDefault, \
+    SerializerMethodField
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, Comment, \
-    CommentImage, OrderItem, CartItem
+    CommentImage, OrderItem, CartItem, ProductVariant
 from apps.models.chats import Message, ChatRoom
 from apps.models.products import AttributeValue, Attribute
 from apps.models.utils import uz_phone_validator
@@ -140,11 +140,62 @@ class DynamicFieldsModelSerializer(ModelSerializer):
                 self.fields.pop(field_name)
 
 
+class ProductVariantSerializer(ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = '__all__'
+
+
 class ProductModelSerializer(DynamicFieldsModelSerializer):
+    product_variants = ProductVariantSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
-        fields = 'name', 'slug', 'price', 'rating'
+        fields = 'id', 'name', 'rating', 'comments_count', "slug", "product_variants", 'shop',
 
+    def to_representation(self, instance: Product):
+        re = super().to_representation(instance)
+        request = self.context.get('request')
+        first_image = instance.images.first()
+        if first_image and first_image.image:
+            try:
+                re['image'] = first_image.image.url
+            except (ValueError, AttributeError):
+                re['image'] = None
+        else:
+            re['image'] = None
+
+        if request and request.user.is_authenticated:
+            re['is_favorite'] = Favorite.objects.filter(user=request.user, product=instance).exists()
+        else:
+            re['is_favorite'] = False
+        if hasattr(instance, 'product_items') and instance.product_items.exists():
+            re['price'] = instance.product_items.first().price
+        else:
+            re['price'] = getattr(instance, 'price', 0)
+        if hasattr(instance, 'product_items') and instance.product_items.exists():
+            first_variant = instance.product_items.first()
+            re['discount_price'] = getattr(first_variant, 'price_delta', None)
+        else:
+            re['discount_price'] = getattr(instance, 'discount_price', None)
+        if instance.shop:
+            shop_image = None
+            if instance.shop.image:
+                try:
+                    shop_image = instance.shop.image.url
+                except (ValueError, AttributeError):
+                    shop_image = None
+            re['shop'] = {
+                'id': instance.shop.id,
+                'name': instance.shop.name,
+                'slug': instance.shop.slug,
+                'image': shop_image,
+                'rating': instance.shop.rating
+            }
+        else:
+            re['shop'] = None
+
+        return re
 
 class ShopModelSerializer(ModelSerializer):
     class Meta:
@@ -152,26 +203,79 @@ class ShopModelSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class FavoriteListProductModelSerializer(DynamicFieldsModelSerializer):
+class CartItemModelSerializer(DynamicFieldsModelSerializer):
     user = HiddenField(default=CurrentUserDefault())
 
     class Meta:
-        model = Favorite
-        fields = 'id', 'user', 'product'
+        model = CartItem
+        fields = 'user', 'product', 'quantity'
+        extra_kwargs = {
+            'product': {'read_only': True},
+            'quantity': {'write_only': True},
+        }
 
-    def save(self, **kwargs):
-        product = kwargs.get('product')
-        user = kwargs.get('user')
-        obj, created = self.Meta.model.objects.get_or_create(
-            product=product, user=user)
-        if not created:
-            obj.delete()
-            return Favorite(user=user, product=product)
-        return obj
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        user = self.context['request'].user
+        repr.update(**ProductModelSerializer(instance.product,
+                                             context={'request': self.context.get('request')}).data)
+        repr['seller_name'] = instance.product.shop.name
+        repr['is_favorite'] = Favorite.objects.filter(user=user, product=instance.product).exists()
+        card_item = CartItem.objects.filter(card__user=user, product=instance.product).only('quantity').first()
+        if card_item:
+            repr['quantity'] = card_item.quantity
+        else:
+            repr['quantity'] = 0
+        return repr
+
+
+class CartListSerializer(DynamicFieldsModelSerializer):
+    user = HiddenField(default=CurrentUserDefault())
+    product_detail = ProductModelSerializer(source='product', read_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = 'user', 'product', 'quantity', 'product_detail'
+
+
+class FavoriteListProductModelSerializer(DynamicFieldsModelSerializer):
+    user = HiddenField(default=CurrentUserDefault())
+    is_favorite = serializers.BooleanField(read_only=True)
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), write_only=True)
+    product_detail = ProductModelSerializer(source='product', read_only=True)
+
+    class Meta:
+        model = Favorite
+        fields = 'id', 'user', 'product', 'product_detail', 'is_favorite'
+        validators = []
+
+    def create(self, validated_data):
+        from django.db import IntegrityError
+        product = validated_data.get('product')
+        user = validated_data.get('user')
+        try:
+            obj = self.Meta.model.objects.create(product=product, user=user)
+            self._is_favorite = True
+            return obj
+        except IntegrityError:
+            existing = self.Meta.model.objects.get(product=product, user=user)
+            existing.delete()
+            self._is_favorite = False
+            self._deleted_instance = existing
+            return self.Meta.model(product=product, user=user)
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        repr['is_favorite'] = getattr(self, '_is_favorite', True)
+        if not repr['is_favorite']:
+            repr['id'] = None
+            repr['product'] = None
+        return repr
 
 
 class FavoriteRetrieveProductSerializer(DynamicFieldsModelSerializer):
     user = HiddenField(default=CurrentUserDefault())
+    product = ProductModelSerializer(read_only=True)
 
     class Meta:
         model = Favorite
@@ -179,13 +283,17 @@ class FavoriteRetrieveProductSerializer(DynamicFieldsModelSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        user = self.context['request'].user
-        cart_item = CartItem.objects.filter(
-            card__user=user, product=instance.product).only('quantity').first()
-        if cart_item:
-            repr['quantity'] = cart_item.quantity
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            cart_item = CartItem.objects.filter(
+                cart__user=request.user, product=instance.product).only('quantity').first()
+            if cart_item:
+                repr['quantity'] = cart_item.quantity
+            else:
+                repr['quantity'] = 0
         else:
             repr['quantity'] = 0
+        repr['is_favorite'] = True
         return repr
 
 
@@ -236,7 +344,7 @@ class CategoryDetailModelSerializer(ModelSerializer):
 
     def to_representation(self, instance: Category):
         repr = super().to_representation(instance)
-        attrs = instance.attribute.all()
+        attrs = instance.attribute_value.all()
         repr["attributes"] = AttributeSerializer(attrs, many=True).data if attrs else []
         return repr
 
@@ -255,10 +363,22 @@ class RegisterModelSerializer(ModelSerializer):
         key = register_key(phone)
         is_available_code = r.get(key)
         remaining_time = r.ttl(key)
+
+        # Handle expired or missing code
         if not is_available_code:
-            raise ValidationError({"message": "Kod muddati tugagan yoki yuborilmagan", "ttl": 0})
-        if is_available_code != str(code):
-            raise ValidationError({"message": "Kod muddati bor sizga yuborilgan...", "ttl": remaining_time})
+            raise ValidationError("Tasdiqlash kodi muddati tugagan yoki yuborilmagan")
+
+        # Handle wrong code
+        if str(is_available_code) != str(code):
+            # Check if code still has time remaining
+            if remaining_time > 0:
+                raise ValidationError(
+                    f"Noto'g'ri kod. Iltimos, to'g'ri kodni kiriting. "
+                    f"Qolgan vaqt: {remaining_time // 60}:{remaining_time % 60:02d}"
+                )
+            else:
+                raise ValidationError("Tasdiqlash kodi muddati tugagan. Iltimos, yangi kod oling")
+
         return super().validate(attrs)
 
     def create(self, validated_data):
@@ -270,6 +390,11 @@ class RegisterModelSerializer(ModelSerializer):
     def to_representation(self, instance: User):
         re = super().to_representation(instance)
         refresh = RefreshToken.for_user(instance)
+        re['id'] = instance.id
+        re['phone'] = instance.phone
+        re['first_name'] = instance.first_name
+        re['last_name'] = instance.last_name
+        re['type'] = instance.type
         re['data'] = {
             'refresh token': str(refresh),
             'access token': str(
@@ -277,28 +402,27 @@ class RegisterModelSerializer(ModelSerializer):
         return re
 
 
-class ProductListSerializer(ModelSerializer):
+class UserUpdateModelSerializer(ModelSerializer):
     class Meta:
-        model = Product
-        fields = 'name', 'rating', 'comments_count',
-
-    def to_representation(self, instance: Product):
-        re = super().to_representation(instance)
-        re['price'] = instance.variants.first().price
-        re['image'] = instance.images.first()
-        return re
+        model = User
+        fields = 'first_name', 'last_name', 'email'
+        extra_kwargs = {
+            'first_name': {'required': False},
+            'last_name': {'required': False},
+            'email': {'required': False},
+        }
 
 
 class ShopRetrieveUpdateDestroySerializer(ModelSerializer):
     class Meta:
         model = Shop
-        fields = 'name', 'banner', 'rating', 'description', "image", 'order_count', 'created_at', 'comment_count'
+        fields = 'id', 'slug', 'name', 'banner', 'rating', 'description', "image", 'order_count', 'created_at', 'comment_count'
 
 
 class ShopListCreateSerializer(ModelSerializer):
     class Meta:
         model = Shop
-        fields = 'name', 'image', 'rating', 'comment_count', 'description', 'banner'
+        fields = 'id', 'slug', 'name', 'image', 'rating', 'comment_count', 'description', 'banner'
 
 
 class CommentListModelSerializer(ModelSerializer):

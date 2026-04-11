@@ -1,0 +1,36 @@
+[
+  {
+    "model": "apps.country",
+    "pk": 1,
+    "fields": {
+      "name": "O'zbekiston"
+    }
+  },
+  {
+    "model": "apps.city",
+    "pk": 1,
+    "fields": {
+      "name": "Toshkent",
+      "is_default": true,
+      "location": "41.2995,69.2401"
+    }
+  },
+  {
+    "model": "apps.city",
+    "pk": 2,
+    "fields": {
+      "name": "Samarqand",
+      "is_default": false,
+      "location": "39.6270,66.9750"
+    }
+  },
+  {
+    "model": "apps.city",
+    "pk": 3,
+    "fields": {
+      "name": "Buxoro",
+      "is_default": false,
+      "location": "39.7747,64.4286"
+    }
+  }
+]
