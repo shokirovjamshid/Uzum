@@ -412,6 +412,14 @@ class UserUpdateModelSerializer(ModelSerializer):
             'email': {'required': False},
         }
 
+    def validate_email(self, value):
+        if value is None or value == '':
+            return value
+        user = self.instance
+        if User.objects.filter(email=value).exclude(pk=user.pk).exists():
+            raise ValidationError("user with this email already exists.")
+        return value
+
 
 class ShopRetrieveUpdateDestroySerializer(ModelSerializer):
     class Meta:

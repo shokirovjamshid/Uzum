@@ -155,8 +155,9 @@ export const useAuth = () => {
       updateUser(response.data);
       toast.success('Profil muvaffaqiyatli yangilandi!');
     },
-    onError: () => {
-      toast.error('Profilni yangilashda xatolik yuz berdi');
+    onError: (error: any) => {
+      const message = error?.response?.data?.email?.[0] || error?.response?.data?.detail || 'Profilni yangilashda xatolik yuz berdi';
+      toast.error(message);
     },
   });
 

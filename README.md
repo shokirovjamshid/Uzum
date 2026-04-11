@@ -128,13 +128,20 @@
 - **React Router** - Declarative routing
 - **Lucide React** - Beautiful icons
 
-### Infrastructure
+### Infrastructure & Deployment
 <p>
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Compose">
+  <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white" alt="Nginx">
   <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
   <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
-  <img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white" alt="Nginx">
 </p>
+
+- **Docker** - Containerization for consistent development and production environments
+- **Docker Compose** - Multi-container orchestration (PostgreSQL, Redis, Django, React, Nginx)
+- **Nginx** - Reverse proxy, static file serving, and load balancing
+- **PostgreSQL** - Primary relational database
+- **Redis** - Caching, session storage, and WebSocket channel layer
 
 ## Quick Start
 
