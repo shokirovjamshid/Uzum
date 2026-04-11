@@ -1,0 +1,233 @@
+[
+  {
+    "model": "apps.brand",
+    "pk": 1,
+    "fields": { "title": "Samsung" }
+  },
+  {
+    "model": "apps.brand",
+    "pk": 2,
+    "fields": { "title": "Artel" }
+  },
+  {
+    "model": "apps.brand",
+    "pk": 3,
+    "fields": { "title": "Bosch" }
+  },
+  {
+    "model": "apps.attribute",
+    "pk": 1,
+    "fields": { "name": "Rang" }
+  },
+  {
+    "model": "apps.attribute",
+    "pk": 2,
+    "fields": { "name": "Xotira" }
+  },
+  {
+    "model": "apps.product",
+    "pk": 1,
+    "fields": {
+      "name": "Samsung Galaxy S24 Ultra",
+      "category": 1,
+      "guarantee": 12,
+      "shop": 1,
+      "brand": 1,
+      "description": "Eng so'nggi flagman smartfoni.",
+      "short_description": "AI imkoniyatlariga ega smartfon",
+      "rating": 4.9,
+      "is_active": true,
+      "created_at": "2026-04-09T14:00:00Z",
+      "updated_at": "2026-04-09T14:00:00Z",
+      "slug": "samsung-galaxy-s24-ultra-1"
+    }
+  },
+  {
+    "model": "apps.productvariant",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "price": 14500000,
+      "quantity": 15,
+      "feature": {"color": "Titanium Gray"},
+      "attribute": {"RAM": "12GB", "ROM": "512GB"},
+      "sku": "S24U512",
+      "slug": "samsung-s24-gray-1"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 2,
+    "fields": {
+      "name": "Artel Grand Inverter Sovutgich",
+      "category": 10,
+      "guarantee": 36,
+      "shop": 1,
+      "brand": 2,
+      "description": "Energiya tejamkor va shovqinsiz sovutgich.",
+      "short_description": "Inverter kompressorli model",
+      "rating": 4.5,
+      "is_active": true,
+      "created_at": "2026-04-09T14:05:00Z",
+      "updated_at": "2026-04-09T14:05:00Z",
+      "slug": "artel-grand-inverter-2"
+    }
+  },
+  {
+    "model": "apps.productvariant",
+    "pk": 2,
+    "fields": {
+      "product": 2,
+      "price": 6800000,
+      "quantity": 5,
+      "feature": {"color": "White"},
+      "attribute": {"height": "185cm"},
+      "sku": "ART7821",
+      "slug": "artel-fridge-white-2"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 3,
+    "fields": {
+      "name": "Bosch Serie 6 Kir yuvish mashinasi",
+      "category": 15,
+      "guarantee": 24,
+      "shop": 1,
+      "brand": 3,
+      "description": "9 kg sig'im va EcoSilence Drive motor.",
+      "short_description": "Yuqori sifatli nemis texnologiyasi",
+      "rating": 4.8,
+      "is_active": true,
+      "created_at": "2026-04-09T14:10:00Z",
+      "updated_at": "2026-04-09T14:10:00Z",
+      "slug": "bosch-serie-6-3"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 4,
+    "fields": {
+      "name": "Samsung Microwave Oven",
+      "category": 11,
+      "guarantee": 12,
+      "shop": 1,
+      "brand": 1,
+      "description": "Keramik qoplamali mikroto'lqinli pech.",
+      "short_description": "Tez isitish va oson tozalash",
+      "rating": 4.2,
+      "is_active": true,
+      "created_at": "2026-04-09T14:15:00Z",
+      "updated_at": "2026-04-09T14:15:00Z",
+      "slug": "samsung-microwave-4"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 5,
+    "fields": {
+      "name": "Artel Vesta Pechka",
+      "category": 12,
+      "guarantee": 36,
+      "shop": 1,
+      "brand": 2,
+      "description": "To'rt xil pishirish funksiyasi.",
+      "short_description": "Elektr va gazda ishlaydi",
+      "rating": 4.4,
+      "is_active": true,
+      "created_at": "2026-04-09T14:20:00Z",
+      "updated_at": "2026-04-09T14:20:00Z",
+      "slug": "artel-vesta-5"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 6,
+    "fields": {
+      "name": "Professional Tool Set 120pcs",
+      "category": 25,
+      "guarantee": 6,
+      "shop": 1,
+      "brand": null,
+      "description": "Har qanday ta'mirlash ishlari uchun to'plam.",
+      "short_description": "120 bo'lakdan iborat asboblar",
+      "rating": 4.9,
+      "is_active": true,
+      "created_at": "2026-04-09T14:25:00Z",
+      "updated_at": "2026-04-09T14:25:00Z",
+      "slug": "tool-set-120-6"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 7,
+    "fields": {
+      "name": "Beko Idish yuvish mashinasi",
+      "category": 17,
+      "guarantee": 12,
+      "shop": 1,
+      "brand": null,
+      "description": "13 kishilik idishlar sig'imi.",
+      "short_description": "Kam suv sarflaydi",
+      "rating": 4.3,
+      "is_active": true,
+      "created_at": "2026-04-09T14:30:00Z",
+      "updated_at": "2026-04-09T14:30:00Z",
+      "slug": "beko-dishwasher-7"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 8,
+    "fields": {
+      "name": "Samsung Twin Cooling Fridge",
+      "category": 10,
+      "guarantee": 12,
+      "shop": 1,
+      "brand": 1,
+      "description": "Ikki tomonlama sovutish tizimi.",
+      "short_description": "Muzlatmaydi (No Frost)",
+      "rating": 4.7,
+      "is_active": true,
+      "created_at": "2026-04-09T14:35:00Z",
+      "updated_at": "2026-04-09T14:35:00Z",
+      "slug": "samsung-twin-cooling-8"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 9,
+    "fields": {
+      "name": "Asboblar Qisqichi (Katta)",
+      "category": 22,
+      "guarantee": 1,
+      "shop": 1,
+      "brand": null,
+      "description": "Sifatli po'latdan yasalgan.",
+      "short_description": "Sanoat ishlari uchun",
+      "rating": 4.0,
+      "is_active": true,
+      "created_at": "2026-04-09T14:40:00Z",
+      "updated_at": "2026-04-09T14:40:00Z",
+      "slug": "clamp-heavy-duty-9"
+    }
+  },
+  {
+    "model": "apps.product",
+    "pk": 10,
+    "fields": {
+      "name": "Artel EcoWash Kir yuvish mashinasi",
+      "category": 15,
+      "guarantee": 36,
+      "shop": 1,
+      "brand": 2,
+      "description": "Tejamkor suv va elektr sarfi.",
+      "short_description": "7 kg sig'im",
+      "rating": 4.6,
+      "is_active": true,
+      "created_at": "2026-04-09T14:45:00Z",
+      "updated_at": "2026-04-09T14:45:00Z",
+      "slug": "artel-ecowash-10"
+    }
+  }
+]
