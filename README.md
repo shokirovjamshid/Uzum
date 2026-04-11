@@ -46,10 +46,14 @@
 ## 🎥 Demo & Preview
 
 <p align="center">
-  <img src="https://via.placeholder.com/800x450/7C3AED/FFFFFF?text=Uzum+Market+Demo+Video" alt="Demo Video" width="80%">
+  <img src="static/demo1.png" alt="Uzum Market Screenshot 1" width="80%">
 </p>
 
-
+<p align="center">
+  <img src="static/demo2.png" alt="Uzum Market Screenshot 2" width="45%">
+  &nbsp;
+  <img src="static/demo3.png" alt="Uzum Market Screenshot 3" width="45%">
+</p>
 
 ---
 
