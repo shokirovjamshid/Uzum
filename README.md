@@ -49,10 +49,7 @@
   <img src="https://via.placeholder.com/800x450/7C3AED/FFFFFF?text=Uzum+Market+Demo+Video" alt="Demo Video" width="80%">
 </p>
 
-<p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/🌐 Live Demo-uzum.uz-7C3AED?style=for-the-badge" alt="Live Demo"></a>
-  <a href="#"><img src="https://img.shields.io/badge/📱 Mobile App-Download-000000?style=for-the-badge" alt="Mobile App"></a>
-</p>
+
 
 ---
 
