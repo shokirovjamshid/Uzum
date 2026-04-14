@@ -1,3 +1,5 @@
+.PHONY: mig celery celery-beat flower superuser frontend
+
 mig:
 	python3 manage.py makemigrations apps
 	python3 manage.py migrate
@@ -12,3 +14,6 @@ flower:
 	celery -A root.celery flower --port=5001
 superuser:
 	python3 manage.py createsuperuser
+
+frontend:
+	cd frontend && npm run dev
