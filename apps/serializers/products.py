@@ -1,20 +1,12 @@
-from datetime import timedelta
-
-from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import CharField, ChoiceField, IntegerField, HiddenField, CurrentUserDefault, \
+from rest_framework.fields import HiddenField, CurrentUserDefault, \
     SerializerMethodField
-from rest_framework.serializers import ModelSerializer, Serializer
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.serializers import ModelSerializer
 
-from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, User, Comment, \
+from apps.models import City, DeliveryPoint, Weekday, Favorite, Product, Shop, Category, Comment, \
     CommentImage, OrderItem, CartItem, ProductVariant
-from apps.models.chats import Message, ChatRoom
 from apps.models.products import AttributeValue, Attribute
-from apps.models.utils import uz_phone_validator
-from apps.tasks import register_key
-from root.settings import r
 
 
 class CityListModelSerializer(ModelSerializer):
@@ -45,78 +37,56 @@ class DeliveryPointsRetrieveModelSerializer(ModelSerializer):
         fields = 'address', 'has_dressing_room', 'weekdays', 'location', 'order_retention_period'
 
 
-class MessageSerializer(ModelSerializer):
+class ShopRetrieveUpdateDestroySerializer(ModelSerializer):
     class Meta:
-        model = Message
-        fields = ('id', 'chat', 'sender', 'text', 'image', 'created_at', 'is_read')
+        model = Shop
+        fields = 'id', 'slug', 'name', 'banner', 'rating', 'description', "image", 'order_count', 'created_at', 'comment_count'
 
 
-class ChatRoomModelSerializer(ModelSerializer):
+class ShopListCreateSerializer(ModelSerializer):
     class Meta:
-        model = ChatRoom
-        fields = '__all__'
-        ordering = 'last_message_at',
-
-    def to_representation(self, instance: ChatRoom):
-        repr = super().to_representation(instance)
-        repr['last_message_at'] = instance.last_message_at.date() if instance.last_message_at + timedelta(
-            days=1) < now() else instance.last_message_at.time().strftime('%H:%M')
-        last_message = instance.messages.order_by('-created_at').first().text
-        repr['last_message'] = last_message if last_message else '🌄'
-        repr['message_not_read_count'] = instance.messages.filter(is_read=False).count()
-        return repr
+        model = Shop
+        fields = 'id', 'slug', 'name', 'image', 'rating', 'comment_count', 'description', 'banner'
 
 
-class ChatRoomSerializer(ModelSerializer):
-    last_message = SerializerMethodField()
+class CommentListModelSerializer(ModelSerializer):
+    class Meta:
+        model = Comment
+        exclude = 'is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'status', 'user', 'product'
+
+
+class CommentImageSerializer(ModelSerializer):
+    class Meta:
+        model = CommentImage
+        fields = ["id", "image"]
+
+
+class CommentCreateModelSerializer(ModelSerializer):
+    user = HiddenField(default=CurrentUserDefault())
+    images = CommentImageSerializer()
 
     class Meta:
-        model = ChatRoom
-        fields = ('id', 'buyer', 'shop', 'last_message_at', 'last_message',)
+        model = Comment
+        fields = 'user', 'product', 'user_name', 'quality_assessment', 'service_evaluation', 'delivery_speed_assessment', 'advantages', 'disadvantages', 'comment', 'is_anonymous', 'images'
 
-    def get_last_message(self, obj):
-        message = getattr(
-            obj,
-            "_last_message",
-            None) or obj.messages.order_by('-created_at').first()
-        if not message:
-            return None
-        return MessageSerializer(message).data
+    def validate(self, attrs):
+        user = attrs.get('user')
+        product = attrs.get('product')
+        if not OrderItem.objects.filter(product=product, order__user=user).exists():
+            raise ValidationError('Siz kommit yoza olmaysiz')
+        return super().validate(attrs)
 
-
-class QRLoginRequestResponseSerializer(Serializer):
-    token = CharField(
-        help_text="Statusni tekshirish uchun ishlatiladigan UUID")
-    qr_image = CharField(help_text="Base64 formatidagi QR rasm")
-
-
-class QRLoginAuthorizeRequestSerializer(serializers.Serializer):
-    token = CharField(
-        help_text="QR koddan o'qib olingan imzolangan (signed) token")
-
-    def validate_token(self, value):
-        if not value:
-            raise serializers.ValidationError(
-                "Token bo'sh bo'lishi mumkin emas.")
-        return value
-
-
-class QRLoginStatusResponseSerializer(Serializer):
-    status = ChoiceField(
-        choices=[
-            "pending",
-            "approved",
-            "expired"],
-        help_text="Login holati")
-    access = CharField(required=False, allow_null=True)
-    refresh = CharField(required=False, allow_null=True)
-
-    def validate(self, data):
-        if data.get("status") == "approved":
-            if not data.get("access") or not data.get("refresh"):
-                raise serializers.ValidationError(
-                    "Tasdiqlangan login uchun tokenlar taqdim etilishi shart.")
-        return data
+    def create(self, validated_data):
+        images = validated_data.pop('images')
+        is_anonymous = validated_data.get('is_anonymous')
+        user = validated_data.get('user')
+        user_name = 'Anonim'
+        if not is_anonymous:
+            user_name = user.first_name
+        comments = self.Meta.model.objects.create(**validated_data, user_name=user_name)
+        comments_list = [CommentImage(comment=comments, image=image) for image in images]
+        CommentImage.objects.bulk_create(comments_list)
+        return comments
 
 
 class DynamicFieldsModelSerializer(ModelSerializer):
@@ -196,6 +166,7 @@ class ProductModelSerializer(DynamicFieldsModelSerializer):
             re['shop'] = None
 
         return re
+
 
 class ShopModelSerializer(ModelSerializer):
     class Meta:
@@ -347,127 +318,3 @@ class CategoryDetailModelSerializer(ModelSerializer):
         attrs = instance.attribute_value.all()
         repr["attributes"] = AttributeSerializer(attrs, many=True).data if attrs else []
         return repr
-
-
-class RegisterModelSerializer(ModelSerializer):
-    phone = CharField(max_length=12, validators=[uz_phone_validator])
-    code = IntegerField(min_value=100000, max_value=999999, write_only=True)
-
-    class Meta:
-        model = User
-        fields = 'phone', 'code'
-
-    def validate(self, attrs):
-        phone = attrs.get('phone')
-        code = attrs.pop('code')
-        key = register_key(phone)
-        is_available_code = r.get(key)
-        remaining_time = r.ttl(key)
-
-        # Handle expired or missing code
-        if not is_available_code:
-            raise ValidationError("Tasdiqlash kodi muddati tugagan yoki yuborilmagan")
-
-        # Handle wrong code
-        if str(is_available_code) != str(code):
-            # Check if code still has time remaining
-            if remaining_time > 0:
-                raise ValidationError(
-                    f"Noto'g'ri kod. Iltimos, to'g'ri kodni kiriting. "
-                    f"Qolgan vaqt: {remaining_time // 60}:{remaining_time % 60:02d}"
-                )
-            else:
-                raise ValidationError("Tasdiqlash kodi muddati tugagan. Iltimos, yangi kod oling")
-
-        return super().validate(attrs)
-
-    def create(self, validated_data):
-        phone = validated_data.get('phone')
-        user, _ = self.Meta.model.objects.get_or_create(**validated_data)
-        r.delete(register_key(phone))
-        return user
-
-    def to_representation(self, instance: User):
-        re = super().to_representation(instance)
-        refresh = RefreshToken.for_user(instance)
-        re['id'] = instance.id
-        re['phone'] = instance.phone
-        re['first_name'] = instance.first_name
-        re['last_name'] = instance.last_name
-        re['type'] = instance.type
-        re['data'] = {
-            'refresh token': str(refresh),
-            'access token': str(
-                refresh.access_token)}
-        return re
-
-
-class UserUpdateModelSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = 'first_name', 'last_name', 'email'
-        extra_kwargs = {
-            'first_name': {'required': False},
-            'last_name': {'required': False},
-            'email': {'required': False},
-        }
-
-    def validate_email(self, value):
-        if value is None or value == '':
-            return value
-        user = self.instance
-        if User.objects.filter(email=value).exclude(pk=user.pk).exists():
-            raise ValidationError("user with this email already exists.")
-        return value
-
-
-class ShopRetrieveUpdateDestroySerializer(ModelSerializer):
-    class Meta:
-        model = Shop
-        fields = 'id', 'slug', 'name', 'banner', 'rating', 'description', "image", 'order_count', 'created_at', 'comment_count'
-
-
-class ShopListCreateSerializer(ModelSerializer):
-    class Meta:
-        model = Shop
-        fields = 'id', 'slug', 'name', 'image', 'rating', 'comment_count', 'description', 'banner'
-
-
-class CommentListModelSerializer(ModelSerializer):
-    class Meta:
-        model = Comment
-        exclude = 'is_anonymous', 'service_evaluation', 'delivery_speed_assessment', 'status', 'user', 'product'
-
-
-class CommentImageSerializer(ModelSerializer):
-    class Meta:
-        model = CommentImage
-        fields = ["id", "image"]
-
-
-class CommentCreateModelSerializer(ModelSerializer):
-    user = HiddenField(default=CurrentUserDefault())
-    images = CommentImageSerializer()
-
-    class Meta:
-        model = Comment
-        fields = 'user', 'product', 'user_name', 'quality_assessment', 'service_evaluation', 'delivery_speed_assessment', 'advantages', 'disadvantages', 'comment', 'is_anonymous', 'images'
-
-    def validate(self, attrs):
-        user = attrs.get('user')
-        product = attrs.get('product')
-        if not OrderItem.objects.filter(product=product, order__user=user).exists():
-            raise ValidationError('Siz kommit yoza olmaysiz')
-        return super().validate(attrs)
-
-    def create(self, validated_data):
-        images = validated_data.pop('images')
-        is_anonymous = validated_data.get('is_anonymous')
-        user = validated_data.get('user')
-        user_name = 'Anonim'
-        if not is_anonymous:
-            user_name = user.first_name
-        comments = self.Meta.model.objects.create(**validated_data, user_name=user_name)
-        comments_list = [CommentImage(comment=comments, image=image) for image in images]
-        CommentImage.objects.bulk_create(comments_list)
-        return comments
