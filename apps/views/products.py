@@ -58,7 +58,7 @@ class DeliveryPointsRetrieveAPIView(RetrieveAPIView):
 
 @extend_schema(tags=['Product'])  # ☑️
 class CategoryListAPIView(ListAPIView):
-    queryset = Category.objects.defer('attribute_value', 'path', 'product_amount')
+    queryset = Category.objects.defer( 'path', 'product_amount')
     serializer_class = CategoryModelSerializer
 
     def list(self, request, *args, **kwargs):

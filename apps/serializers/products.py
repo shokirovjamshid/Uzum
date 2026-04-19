@@ -315,6 +315,6 @@ class CategoryDetailModelSerializer(ModelSerializer):
 
     def to_representation(self, instance: Category):
         repr = super().to_representation(instance)
-        attrs = instance.attribute_value.all()
+        attrs = instance.attributes.all()
         repr["attributes"] = AttributeSerializer(attrs, many=True).data if attrs else []
         return repr
